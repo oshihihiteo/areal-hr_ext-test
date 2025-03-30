@@ -1,7 +1,7 @@
 <h3>Инструметы, используемые для реализации проекта</h3>
 <strong>Среда разработки:</strong> IntelliJ IDEA 2023.3.4.<br>
 <strong>Операционная система</strong>: Windows 11 с установленным WSL2 и Docker Desktop.<br>
-<strong>Способ установки PostgreSQL</strong>: Docker контейнер.<br>
+<strong>Способ установки PostgreSQL</strong>: в операционную систему.<br>
 
 <h3>Основные команды для работы с ситсемой контроля версий Git</h3>
 Настройка:
