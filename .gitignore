@@ -11,7 +11,7 @@ node_modules/
 npm-debug.log
 yarn.lock
 
-.env
+api/.env
 .env.local
 .env.production
 config.json

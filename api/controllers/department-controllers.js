@@ -1,4 +1,5 @@
 const Departments = require("../models/departments-model");
+const departmentSchema = require("../validationSchemas/departmentSchema");
 
 exports.getAllDepartments = async (req, res) => {
     try {
@@ -21,12 +22,12 @@ exports.getDepartmentById = async (req, res) => {
 };
 
 exports.createDepartment = async (req, res) => {
-    const { departmentData } = req.body;
-
+    const { error } = departmentSchema.validate(req.body.departmentData);
+    if (error) {
+        return res.status(400).json({ message: 'Ошибка валидации данных: ' + error.details[0].message });
+    }
     try {
-        const department = await Departments.create(
-            departmentData
-        );
+        const department = await Departments.create(req.body.departmentData);
         res.status(200).json({ message: "Отдел добавлен." });
     } catch (error) {
         console.error(error);
@@ -48,10 +49,12 @@ exports.deleteDepartment = async (req, res) => {
 
 exports.editDepartment = async (req, res) => {
     const id = parseInt(req.params.id);
-    const {departmentData } = req.body;
-
+    const { error } = departmentSchema.validate(req.body.departmentData);
+    if (error) {
+        return res.status(400).json({ message: 'Ошибка валидации данных: ' + error.details[0].message });
+    }
     try {
-        const department = await Departments.edit(id, departmentData
+        const department = await Departments.edit(id, req.body.departmentData
         );
         res.status(200).json({ message: "Данные отдела изменены." });
     } catch (error) {

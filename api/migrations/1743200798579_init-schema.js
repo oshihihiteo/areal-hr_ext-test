@@ -34,8 +34,7 @@ exports.up = (pgm) => {
         },
         name: {
             type: 'varchar(255)',
-            notNull: true,
-            unique: true
+            notNull: true
         },
         organization_id: {
             type: 'int',
@@ -48,7 +47,6 @@ exports.up = (pgm) => {
             notNull: false,
             references: '"departments"(id)',
             onDelete: 'SET NULL'
-
         },
         comment: {
             type: 'text',
@@ -58,8 +56,7 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
+    pgm.dropTable('departments', { cascade: true });
+    pgm.dropTable('organizations', { cascade: true });
     pgm.dropTable('positions');
-    pgm.dropTable('organizations');
-    pgm.dropTable('departments');
 };
-

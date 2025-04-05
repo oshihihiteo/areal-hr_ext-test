@@ -32,6 +32,14 @@ class PositionsModel {
             [id, positionData.name]
         );
     }
+
+    static async findByName(positionName){
+        const result = await client.query(
+            "SELECT * FROM positions WHERE name = $1",
+            [positionName]
+        );
+        return result.rows[0] || null;
+    }
 }
 
 module.exports = PositionsModel;

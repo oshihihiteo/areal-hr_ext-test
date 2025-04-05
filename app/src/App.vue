@@ -1,43 +1,21 @@
 <template>
   <div class="app-container">
-    <NavigationBar @changeView="currentView = $event" />
+    <NavigationBar></NavigationBar>
     <div class="content">
-      <component :is="currentComponent"></component>
+      <router-view />
     </div>
   </div>
 </template>
 
-<script>
-import Organizations from "./components/Organizations.vue";
-import Departments from "./components/Departments.vue";
-import Positions from "./components/Positions.vue";
-import NavigationBar from "./components/NavigationBar.vue";
-
-export default {
-  components: {
-    NavigationBar,
-    Organizations,
-    Departments,
-    Positions,
-  },
-  data() {
-    return {
-      currentView: "organizations",
-    };
-  },
-  computed: {
-    currentComponent() {
-      return this.currentView === "organizations"
-          ? "Organizations"
-          : this.currentView === "departments"
-              ? "Departments"
-              : "Positions";
-    },
-  },
-};
-</script>
-
 <style>
+nav {
+  padding: 10px;
+}
+nav a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: blue;
+}
 .app-container {
   display: flex;
 }
@@ -48,3 +26,13 @@ export default {
   flex-grow: 1;
 }
 </style>
+
+<script>
+import {defineComponent} from "vue";
+import NavigationBar from "@/components/NavigationBar.vue";
+
+export default defineComponent({
+  components: {NavigationBar}
+})
+</script>
+

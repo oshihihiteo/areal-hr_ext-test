@@ -1,4 +1,6 @@
 const Positions = require("../models/positions-model");
+const Joi = require('joi');
+const positionSchema = require('../validationSchemas/positionShema');
 
 exports.getAllPositions = async (req, res) => {
     try {
@@ -21,12 +23,15 @@ exports.getPositionById = async (req, res) => {
 };
 
 exports.createPosition = async (req, res) => {
-    const { positionData } = req.body;
-
     try {
-        const position = await Positions.create(
-            positionData
-        );
+        await positionSchema.validateAsync(req.body.positionData);
+    } catch (error) {
+        return res.status(400).json({
+            message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+        });
+    }
+    try {
+        await Positions.create(req.body.positionData);
         res.status(200).json({ message: "Должность добавлена." });
     } catch (error) {
         console.error(error);
@@ -38,7 +43,7 @@ exports.deletePosition = async (req, res) => {
     const id = parseInt(req.params.id);
 
     try {
-        const position = await Positions.delete(id);
+        await Positions.delete(id);
         res.status(200).json({ message: "Должность удалена." });
     } catch (error) {
         console.error(error);
@@ -48,10 +53,15 @@ exports.deletePosition = async (req, res) => {
 
 exports.editPosition = async (req, res) => {
     const id = parseInt(req.params.id);
-    const {positionData } = req.body;
-
     try {
-        const organization = await Positions.edit(id, positionData);
+        await positionSchema.validateAsync(req.body.positionData);
+    } catch (error) {
+        return res.status(400).json({
+            message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+        });
+    }
+    try {
+        await Positions.edit(id, req.body.positionData);
         res.status(200).json({ message: "Данные должности изменены." });
     } catch (error) {
         console.error(error);

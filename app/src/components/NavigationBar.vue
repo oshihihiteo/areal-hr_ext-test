@@ -1,8 +1,10 @@
 <template>
   <div class="navbar">
-    <button @click="$emit('changeView', 'organizations')">Организации</button>
-    <button @click="$emit('changeView', 'departments')">Отделы</button>
-    <button @click="$emit('changeView', 'positions')">Должности</button>
+    <nav>
+      <router-link to="/positions">Должности</router-link> <br>
+      <router-link to="/organizations">Организации</router-link> <br>
+      <router-link to="/departments">Отделы</router-link>
+    </nav>
   </div>
 </template>
 
@@ -34,3 +36,5 @@
   background-color: #c1c3cb;
 }
 </style>
+<script setup>
+</script>

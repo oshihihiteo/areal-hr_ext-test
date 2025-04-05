@@ -4,16 +4,19 @@
   "private": true,
   "scripts": {
     "start": "node ./app",
-    "migrate": "npx dotenv -e .env -- npx node-pg-migrate up",
-    "migrate-down": "npx node-pg-migrate down"
+    "migrate": "dotenv -e ../.env npx node-pg-migrate up",
+    "migrate-down": "dotenv -e ../.env npx node-pg-migrate down"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^16.4.7",
-    "express": "~4.16.1",
+    "express": "^4.21.2",
+    "joi": "^17.13.3",
     "morgan": "~1.9.1",
-    "node-pg-migrate": "^7.9.1",
     "pg": "^8.14.1"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^7.9.1"
   }
 }
