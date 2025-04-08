@@ -1,5 +1,6 @@
 const Departments = require("../models/departments-model");
 const departmentSchema = require("../validationSchemas/departmentSchema");
+const Changelog = require("./changelog-controller");
 
 exports.getAllDepartments = async (req, res) => {
     try {
@@ -29,6 +30,13 @@ exports.createDepartment = async (req, res) => {
     try {
         const department = await Departments.create(req.body.departmentData);
         res.status(200).json({ message: "Отдел добавлен." });
+
+        const changelog = {
+            object_type_id: 2,
+            object_id: department,
+            changed_fields: req.body.departmentData
+        };
+        await Changelog.createChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при добавлении отдела: ", error });
@@ -41,6 +49,12 @@ exports.deleteDepartment = async (req, res) => {
     try {
         const department = await Departments.delete(id);
         res.status(200).json({ message: "Отдел удалён." });
+        const changelog = {
+            object_type_id: 2,
+            object_id: id,
+            changed_fields: null
+        };
+        await Changelog.deleteChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при удалении отдела: ", error });
@@ -57,6 +71,14 @@ exports.editDepartment = async (req, res) => {
         const department = await Departments.edit(id, req.body.departmentData
         );
         res.status(200).json({ message: "Данные отдела изменены." });
+
+        const changelog = {
+            object_type_id: 2,
+            object_id: id,
+            changed_fields: req.body.departmentData
+        };
+        await Changelog.editChangelog(changelog);
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при изменении отдела: ", error });

@@ -1,6 +1,7 @@
 const Organizations = require("../models/organizations-model");
 const Joi = require('joi');
 const organizationSchema = require('../validationSchemas/organizationSchema');
+const Changelog = require("./changelog-controller");
 
 exports.getAllOrganizations = async (req, res) => {
     try {
@@ -31,9 +32,15 @@ exports.createOrganization = async (req, res) => {
         });
     }
     try {
-        await Organizations.create(req.body.organizationData
+        const organization = await Organizations.create(req.body.organizationData
         );
         res.status(200).json({ message: "Организация добавлена." });
+        const changelog = {
+            object_type_id: 3,
+            object_id: organization,
+            changed_fields: req.body.organizationData
+        };
+        await Changelog.createChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при добавлении организации: ", error });
@@ -46,6 +53,12 @@ exports.deleteOrganization = async (req, res) => {
     try {
         await Organizations.delete(id);
         res.status(200).json({ message: "Организация удалена." });
+        const changelog = {
+            object_type_id: 3,
+            object_id: id,
+            changed_fields: null
+        };
+        await Changelog.deleteChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при удалении организации: ", error });
@@ -64,6 +77,12 @@ exports.editOrganization = async (req, res) => {
     try {
         await Organizations.edit(id,req.body.organizationData);
         res.status(200).json({ message: "Данные организации изменены." });
+        const changelog = {
+            object_type_id: 3,
+            object_id: id,
+            changed_fields: req.body.organizationData
+        };
+        await Changelog.editChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при изменении организации: ", error });

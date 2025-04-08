@@ -1,5 +1,4 @@
 <script>
-import axios from "axios";
 import * as departmentAPI from '../instances/departments.js';
 import * as organizationAPI from '../instances/organizations.js';
 import DepartmentsTable from "@/components/DepartmentsTable.vue";

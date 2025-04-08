@@ -1,4 +1,5 @@
 const Positions = require("../models/positions-model");
+const Changelog = require("./changelog-controller");
 const Joi = require('joi');
 const positionSchema = require('../validationSchemas/positionShema');
 
@@ -31,8 +32,15 @@ exports.createPosition = async (req, res) => {
         });
     }
     try {
-        await Positions.create(req.body.positionData);
+        const position = await Positions.create(req.body.positionData);
         res.status(200).json({ message: "Должность добавлена." });
+
+        const changelog = {
+            object_type_id: 1,
+            object_id: position,
+            changed_fields: req.body.positionData
+        };
+        await Changelog.createChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при добавлении должности: ", error });
@@ -43,8 +51,15 @@ exports.deletePosition = async (req, res) => {
     const id = parseInt(req.params.id);
 
     try {
+        const position = await Positions.getById(id);
         await Positions.delete(id);
         res.status(200).json({ message: "Должность удалена." });
+        const changelog = {
+            object_type_id: 1,
+            object_id: id,
+            changed_fields: null
+        };
+        await Changelog.deleteChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при удалении должности: ", error });
@@ -63,6 +78,13 @@ exports.editPosition = async (req, res) => {
     try {
         await Positions.edit(id, req.body.positionData);
         res.status(200).json({ message: "Данные должности изменены." });
+
+        const changelog = {
+            object_type_id: 1,
+            object_id: id,
+            changed_fields: req.body.positionData
+        };
+        await Changelog.editChangelog(changelog);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Ошибка при изменении должности: ", error });

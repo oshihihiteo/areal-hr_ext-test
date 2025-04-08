@@ -3,7 +3,11 @@
     <nav>
       <router-link to="/positions">Должности</router-link> <br>
       <router-link to="/organizations">Организации</router-link> <br>
-      <router-link to="/departments">Отделы</router-link>
+      <router-link to="/departments">Отделы</router-link> <br>
+      <router-link to="/employees">Сотрудники</router-link> <br>
+      <router-link to="/hr-operations">Кадровые операции</router-link> <br>
+      <router-link to="/changelog">История изменений</router-link> <br>
+      <router-link to="/files">Файлы</router-link>
     </nav>
   </div>
 </template>

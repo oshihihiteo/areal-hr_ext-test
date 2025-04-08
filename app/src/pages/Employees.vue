@@ -1,58 +1,58 @@
 <script>
-import * as positionAPI from '../instances/positions.js';
-import PositionForm from "../components/PositionForm.vue";
-import PositionsTable from "../components/PositionsTable.vue";
+import * as employeesAPI from '../instances/employees.js';
 import CreateButton from "@/components/CreateButton.vue";
+import EmployeesTable from "@/components/EmployeesTable.vue";
+import EmployeeForm from "@/components/EmployeeForm.vue";
+import EmployeeCard from "@/components/EmployeeCard.vue";
 
 export default {
-  components: { PositionForm, PositionsTable, CreateButton },
+  components: {EmployeeForm, EmployeesTable, CreateButton, EmployeeCard },
   data() {
     return {
-      positions: [],
+      employees: [],
       isFormVisible: false,
       isEditing: false,
-      selectedPosition: null,
-      buttonName: "должность"
+      selectedEmployee: null,
+      buttonName: "сотрудника"
     };
   },
   methods: {
-    async getPositions() {
+    async getEmployees() {
       try {
-        this.positions = await positionAPI.getPositions();
+        this.employees = await employeesAPI.getEmployees();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
-    async createPosition(positionData) {
-      if (!positionData.name.trim()) return;
+    async createEmployee(employeeData) {
+      console.log(employeeData)
       try {
-        await positionAPI.createPosition(positionData);
+        await employeesAPI.createEmployee(employeeData);
         this.handleUpdate()
       } catch (error) {
         console.error("Ошибка при добавлении данных:", error.response ? error.response.data : error.message);
       }
     },
-    async deletePosition(id) {
+    async deleteEmployee(id) {
       if (!confirm("Вы уверены, что хотите удалить?")) return;
       try {
-        await positionAPI.deletePosition(id);
-        await this.getPositions();
+        await employeesAPI.deleteEmployee(id);
+        await this.getEmployees();
       } catch (error) {
         console.error("Ошибка при удалении:", error);
       }
     },
-    async updatePosition(positionData) {
-      if (!positionData.name.trim()) return;
-
-      try {
-        await positionAPI.updatePosition(this.selectedPosition.id, positionData)
+    async updateEmployee(employeeData) {
+      console.log(employeeData);
+         try {
+        await employeesAPI.updateEmployee(this.selectedEmployee.id, employeeData)
         this.handleUpdate()
       } catch (error) {
         console.error("Ошибка при обновлении данных:", error.response ? error.response.data : error.message);
       }
     },
     handleUpdate() {
-      this.getPositions();
+      this.getEmployees();
       this.isFormVisible = false;
     },
     handleCancel() {
@@ -60,39 +60,40 @@ export default {
     },
     showCreateForm() {
       this.isEditing = false;
-      this.selectedPosition = null;
+      this.selectedEmployee = null;
       this.isFormVisible = true;
     },
-    showEditForm(position) {
+    showEditForm(employee) {
       this.isEditing = true;
-      this.selectedPosition = position;
+      this.selectedEmployee = employee;
       this.isFormVisible = true;
     },
   },
   mounted() {
-    this.getPositions();
+    this.getEmployees();
   },
 };
 </script>
 
 <template>
   <div class="content">
-  <h2>Должности</h2>
-  <CreateButton
-    :buttonName = buttonName
-    @create="showCreateForm"/>
-    <PositionsTable
-        :positions="positions"
+    <h2>Сотрудники</h2>
+    <CreateButton
+        :buttonName = buttonName
+        @create="showCreateForm"/>
+
+    <EmployeesTable
+        :employees="employees"
         @edit="showEditForm"
-        @delete="deletePosition"
+        @delete="deleteEmployee"
     />
 
-    <PositionForm
+    <EmployeeForm
         v-if="isFormVisible"
-        :position="selectedPosition"
+        :employee="selectedEmployee"
         :isEditing="isEditing"
-        @update="updatePosition"
-        @create="createPosition"
+        @update="updateEmployee"
+        @create="createEmployee"
         @cancel="handleCancel"
     />
   </div>
