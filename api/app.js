@@ -8,7 +8,7 @@ const employeesRouter = require("./routes/employees-router")
 const filesRouter = require("./routes/files-router")
 const hrRouter = require("./routes/hr-operations-router")
 const changelogRouter = require("./routes/changelog-router")
-const actionsRouter = require("./routes/actions-router")
+const dropdownListOptionsRouter = require("./routes/dropdown-lists-options-router")
 
 const app = express();
 app.use(express.json());
@@ -20,7 +20,7 @@ app.use("/", employeesRouter);
 app.use("/", filesRouter);
 app.use("/", hrRouter);
 app.use("/", changelogRouter);
-app.use("/", actionsRouter);
+app.use("/", dropdownListOptionsRouter);
 app.use(express.static("public"));
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`));

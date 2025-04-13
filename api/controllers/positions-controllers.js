@@ -1,7 +1,7 @@
 const Positions = require("../models/positions-model");
 const Changelog = require("./changelog-controller");
 const Joi = require('joi');
-const positionSchema = require('../validationSchemas/positionShema');
+const positionSchema = require('../validationSchemas/position-schema');
 
 exports.getAllPositions = async (req, res) => {
     try {
@@ -25,25 +25,27 @@ exports.getPositionById = async (req, res) => {
 
 exports.createPosition = async (req, res) => {
     try {
-        await positionSchema.validateAsync(req.body.positionData);
-    } catch (error) {
-        return res.status(400).json({
-            message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
-        });
-    }
-    try {
-        const position = await Positions.create(req.body.positionData);
+        const position = req.body.positionData;
+        await positionSchema.validateAsync(position, { context: {} });
+        const positionId = await Positions.create(position);
         res.status(200).json({ message: "Должность добавлена." });
 
         const changelog = {
             object_type_id: 1,
-            object_id: position,
-            changed_fields: req.body.positionData
+            object_id: positionId,
+            changed_fields: position
         };
         await Changelog.createChangelog(changelog);
     } catch (error) {
+        if (error.isJoi) {
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
-        res.status(500).json({ message: "Ошибка при добавлении должности: ", error });
+        return res.status(500).json({
+            message: "Ошибка при добавлении должности", error: error.message
+        });
     }
 };
 
@@ -69,24 +71,26 @@ exports.deletePosition = async (req, res) => {
 exports.editPosition = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        await positionSchema.validateAsync(req.body.positionData);
-    } catch (error) {
-        return res.status(400).json({
-            message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
-        });
-    }
-    try {
-        await Positions.edit(id, req.body.positionData);
-        res.status(200).json({ message: "Данные должности изменены." });
+        const position = req.body.positionData;
+        await positionSchema.validateAsync(position, { context: {id} });
+        await Positions.edit(id, position);
+        res.status(200).json({ message: "Должность изменена." });
 
         const changelog = {
             object_type_id: 1,
             object_id: id,
-            changed_fields: req.body.positionData
+            changed_fields: position
         };
         await Changelog.editChangelog(changelog);
     } catch (error) {
+        if (error.isJoi) {
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
-        res.status(500).json({ message: "Ошибка при изменении должности: ", error });
+        return res.status(500).json({
+            message: "Ошибка при редактировании должности", error: error.message
+        });
     }
 };

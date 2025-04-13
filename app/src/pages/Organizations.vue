@@ -1,5 +1,4 @@
 <script>
-import axios from "axios";
 import * as organizationAPI from '../instances/organizations.js';
 import OrganizationForm from "../components/OrganizationForm.vue";
 import OrganizationsTable from "../components/OrganizationsTable.vue";

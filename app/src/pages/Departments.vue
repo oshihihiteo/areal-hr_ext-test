@@ -1,6 +1,6 @@
 <script>
 import * as departmentAPI from '../instances/departments.js';
-import * as organizationAPI from '../instances/organizations.js';
+import * as dropdownListAPI from '../instances/dropdown-list-options.js'
 import DepartmentsTable from "@/components/DepartmentsTable.vue";
 import DepartmentForm from "@/components/DepartmentForm.vue";
 import CreateButton from "@/components/CreateButton.vue";
@@ -27,7 +27,7 @@ export default {
     },
     async getOrganizations() {
       try {
-        this.organizations = await organizationAPI.getOrganizations();
+        this.organizations = await dropdownListAPI.getOrganizationsNames();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }

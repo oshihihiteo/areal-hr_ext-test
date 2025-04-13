@@ -1,9 +1,6 @@
 <script>
 import * as hrOperationsAPI from '../instances/hr-operations.js';
-import * as employeesAPI from '../instances/employees.js';
-import * as departmentsAPI from '../instances/departments.js';
-import * as positionsAPI from "../instances/positions.js";
-import * as actionsAPI from "../instances/actions.js";
+import * as dropdownListAPI from '../instances/dropdown-list-options.js'
 import HrOperationForm from "../components/HrOperationForm.vue";
 import HrOperationsTable from "../components/HrOperationsTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
@@ -33,28 +30,28 @@ export default {
     },
     async getEmployees(){
       try{
-        this.employees = await employeesAPI.getEmployees();
+        this.employees = await dropdownListAPI.getEmployeesWithDepartmentsAndPositions()
       } catch (error) {
       console.error("Ошибка при загрузке данных:", error);
       }
     },
     async getDepartments(){
       try{
-        this.departments = await departmentsAPI.getDepartments();
+        this.departments = await dropdownListAPI.getDepartmentsNames()
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
     async getPositions(){
       try{
-        this.positions = await positionsAPI.getPositions();
+        this.positions = await dropdownListAPI.getPositionsNames()
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
     async getActions(){
       try{
-        this.actions = await actionsAPI.getActions();
+        this.actions = await dropdownListAPI.getActionsNames()
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }

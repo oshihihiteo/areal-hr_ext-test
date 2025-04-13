@@ -1,5 +1,6 @@
 const FilesModel = require("../models/files-model");
 const Changelog = require("./changelog-controller");
+const fileSchema = require("../validationSchemas/files-schema")
 
 exports.getAllFiles = async (req, res) => {
     try {
@@ -58,21 +59,27 @@ exports.getRawFileById = async (req, res) => {
 
 exports.createFile = async (req, res) => {
     try {
-        const fileData = {
+        const file = {
             name: req.body.name,
             employee_id: req.body.employee_id,
             file: req.file.filename
         }
-        const id = await FilesModel.create(fileData);
-        res.status(201).json({ message: "Файл создан", id });
+        await fileSchema.validateAsync(file, {context: {}});
+        const fileId = await FilesModel.create(file);
+        res.status(201).json({ message: "Файл создан" });
 
         const changelog = {
             object_type_id: 6,
-            object_id: id,
-            changed_fields: fileData
+            object_id: fileId,
+            changed_fields: file
         };
         await Changelog.createChangelog(changelog);
     } catch (error) {
+        if (error.isJoi){
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при создании файла", error });
     }
@@ -82,21 +89,27 @@ exports.createFile = async (req, res) => {
 exports.editFile = async (req, res) => {
         const id = parseInt(req.params.id);
     try {
-        const fileData = {
+        const file = {
             name: req.body.name,
             employee_id: req.body.employee_id,
             file: req.file.filename
         }
-        const file = await FilesModel.edit(id, fileData);
+        await fileSchema.validateAsync(file, {context: {id}});
+        await FilesModel.edit(id, file);
         res.status(201).json({ message: "Файл изменён"});
 
         const changelog = {
             object_type_id: 6,
             object_id: id,
-            changed_fields: fileData
+            changed_fields: file
         };
         await Changelog.editChangelog(changelog);
     } catch (error) {
+        if (error.isJoi) {
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при изменении файла", error });
     }

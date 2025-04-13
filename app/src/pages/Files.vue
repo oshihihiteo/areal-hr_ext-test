@@ -4,7 +4,7 @@ import CreateButton from "@/components/CreateButton.vue";
 import FilesTable from "@/components/FilesTable.vue";
 import FileForm from "@/components/FileForm.vue";
 import axiosInstance from "@/instances/baseURL.js";
-import * as employeesAPI from "@/instances/employees.js";
+import * as dropdownListAPI from '../instances/dropdown-list-options.js'
 
 
 export default {
@@ -29,7 +29,7 @@ export default {
     },
     async getEmployees() {
       try {
-        this.employees = await employeesAPI.getEmployees();
+        this.employees = await dropdownListAPI.getEmployeesWithDepartmentsAndPositions();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }

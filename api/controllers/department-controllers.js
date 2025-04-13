@@ -1,5 +1,5 @@
 const Departments = require("../models/departments-model");
-const departmentSchema = require("../validationSchemas/departmentSchema");
+const departmentSchema = require("../validationSchemas/department-schema");
 const Changelog = require("./changelog-controller");
 
 exports.getAllDepartments = async (req, res) => {

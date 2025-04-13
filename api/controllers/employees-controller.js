@@ -2,6 +2,7 @@ const Employees = require("../models/employees-model");
 const Addresses = require("../models/addresses-model");
 const PassportData = require("../models/passport-data-model");
 const Changelog = require("./changelog-controller");
+const employeeSchema = require("../validationSchemas/employee-schema")
 
 exports.getAllEmployees = async (req, res) => {
     try {
@@ -24,47 +25,53 @@ exports.getEmployeeById = async (req, res) => {
 };
 
 exports.createEmployee = async (req, res) => {
-    console.log(req.body.employeeData);
     try {
-        const data = req.body.employeeData;
+        const employee = req.body.employeeData;
+        await employeeSchema.validateAsync(employee);
 
         const addressData = {
-            region: data.address_region,
-            settlement: data.address_settlement,
-            street: data.address_street,
-            house: data.address_house,
-            building: data.address_building,
-            apartment: data.address_apartment
+            region: employee.address_region,
+            settlement: employee.address_settlement,
+            street: employee.address_street,
+            house: employee.address_house,
+            building: employee.address_building,
+            apartment: employee.address_apartment
         };
         const addressId = await Addresses.create(addressData);
 
         const passportData = {
-            series: data.passport_series,
-            number: data.passport_number,
-            issued_date: data.passport_issued_date,
-            unit_code: data.passport_unit_code,
-            issued_by: data.passport_issued_by
+            series: employee.passport_series,
+            number: employee.passport_number,
+            issued_date: employee.passport_issued_date,
+            unit_code: employee.passport_unit_code,
+            issued_by: employee.passport_issued_by
         };
         const passportDataId = await PassportData.create(passportData);
 
         const employeeData = {
-            lastname: data.lastname,
-            firstname: data.firstname,
-            patronymic: data.patronymic,
-            birth_date: data.birth_date,
+            lastname: employee.lastname,
+            firstname: employee.firstname,
+            patronymic: employee.patronymic,
+            birth_date: employee.birth_date,
             passport_data_id: passportDataId,
             address_id: addressId
         };
-        const employee = await Employees.create(employeeData);
+        const employeeId = await Employees.create(employeeData);
         res.status(200).json({ message: "Сотрудник добавлен." });
 
         const changelog = {
             object_type_id: 4,
-            object_id: employee,
-            changed_fields: req.body.employeeData
+            object_id: employeeId,
+            changed_fields: employee
         };
         await Changelog.createChangelog(changelog);
+
     } catch (error) {
+        if (error.isJoi){
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при добавлении сотрудника", error });
     }
@@ -96,6 +103,7 @@ exports.editEmployee = async (req, res) => {
     try {
         const employee = await Employees.getById(id);
         const data = req.body.employeeData;
+        await employeeSchema.validate(data);
 
         const addressData = {
             region: data.address_region,
@@ -128,10 +136,15 @@ exports.editEmployee = async (req, res) => {
         const changelog = {
             object_type_id: 4,
             object_id: id,
-            changed_fields: req.body.employeeData
+            changed_fields: data
         };
         await Changelog.editChangelog(changelog);
     } catch (error) {
+        if (error.isJoi){
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при изменении сотрудника", error });
     }

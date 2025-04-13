@@ -35,11 +35,13 @@ class OrganizationsModel {
             organizationData.comment]
         );
     }
-    static async findByName(organizationName){
-        const result = await client.query(
-            "SELECT id FROM organizations WHERE name = $1",
-            [organizationName]
-        );
+    static async findByName(organizationName, id) {
+        const query = `
+            SELECT * FROM organizations 
+            WHERE name = $1 
+            AND ($2::int IS NULL OR id != $2)`;
+        const params = [organizationName, id];
+        const result = await client.query(query, params);
         return result.rows[0] || null;
     }
 }

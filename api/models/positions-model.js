@@ -33,11 +33,13 @@ class PositionsModel {
         );
     }
 
-    static async findByName(positionName){
-        const result = await client.query(
-            "SELECT * FROM positions WHERE name = $1",
-            [positionName]
-        );
+    static async findByName(positionName, id) {
+        const query = `
+            SELECT * FROM positions 
+            WHERE name = $1 
+            AND ($2::int IS NULL OR id != $2)`;
+        const params = [positionName, id];
+        const result = await client.query(query, params);
         return result.rows[0] || null;
     }
 }

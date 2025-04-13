@@ -1,5 +1,6 @@
 const HR_operations = require("../models/hr-operations-model");
 const Changelog = require("./changelog-controller");
+const  hrOperationSchema = require("../validationSchemas/hr-operations-schema")
 
 exports.getAllHrOperations = async (req, res) => {
     try {
@@ -11,19 +12,25 @@ exports.getAllHrOperations = async (req, res) => {
 };
 
 exports.createHrOperation = async (req, res) => {
-    const id = parseInt(req.params.id);
     try {
-        const hr_operation = await HR_operations.create(req.body.hrOperationData);
+        const hrOperation = req.body.hrOperationData;
+        await hrOperationSchema.validateAsync(hrOperation)
+        const hrOperationId = await HR_operations.create(hrOperation);
         res.status(200).json({ message: "Кадровая операция добавлен." });
 
         const changelog = {
             object_type_id: 5,
-            object_id: hr_operation,
-            changed_fields: req.body.hrOperationData
+            object_id: hrOperationId,
+            changed_fields: hrOperation
         };
         await Changelog.createChangelog(changelog);
 
     } catch (error) {
+        if (error.isJoi){
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при добавлении кадровой операции: ", error });
     }
@@ -52,18 +59,24 @@ exports.deleteHrOperation = async (req, res) => {
 exports.editHrOperation = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        const hr_operation = await HR_operations.edit(id, req.body.hrOperationData
-        );
+        const hrOperation = req.body.hrOperationData;
+        await hrOperationSchema.validateAsync(hrOperation);
+        await HR_operations.edit(id,hrOperation);
         res.status(200).json({ message: "Данные кадровой операции изменены." });
 
         const changelog = {
             object_type_id: 5,
             object_id: id,
-            changed_fields: req.body.hrOperationData
+            changed_fields: hrOperation
         };
         await Changelog.editChangelog(changelog);
 
     } catch (error) {
+        if(error.isJoi) {
+            return res.status(400).json({
+                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при изменении кадровой операции: ", error });
     }

@@ -3,10 +3,8 @@ import * as employeesAPI from '../instances/employees.js';
 import CreateButton from "@/components/CreateButton.vue";
 import EmployeesTable from "@/components/EmployeesTable.vue";
 import EmployeeForm from "@/components/EmployeeForm.vue";
-import EmployeeCard from "@/components/EmployeeCard.vue";
-
 export default {
-  components: {EmployeeForm, EmployeesTable, CreateButton, EmployeeCard },
+  components: {EmployeeForm, EmployeesTable, CreateButton },
   data() {
     return {
       employees: [],
