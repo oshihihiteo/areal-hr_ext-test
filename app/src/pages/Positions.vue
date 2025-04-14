@@ -12,6 +12,7 @@ export default {
       isFormVisible: false,
       isEditing: false,
       selectedPosition: null,
+      errors: {},
       buttonName: "должность"
     };
   },
@@ -24,12 +25,17 @@ export default {
       }
     },
     async createPosition(positionData) {
-      if (!positionData.name.trim()) return;
       try {
         await positionAPI.createPosition(positionData);
-        this.handleUpdate()
+        this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка при добавлении данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     async deletePosition(id) {
@@ -42,30 +48,39 @@ export default {
       }
     },
     async updatePosition(positionData) {
-      if (!positionData.name.trim()) return;
-
       try {
-        await positionAPI.updatePosition(this.selectedPosition.id, positionData)
-        this.handleUpdate()
+        await positionAPI.updatePosition(this.selectedPosition.id, positionData);
+        this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка при обновлении данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
+
     },
     handleUpdate() {
       this.getPositions();
       this.isFormVisible = false;
+      this.errors = {};
     },
     handleCancel() {
       this.isFormVisible = false;
+      this.errors = {};
     },
     showCreateForm() {
       this.isEditing = false;
       this.selectedPosition = null;
+      this.errors = {};
       this.isFormVisible = true;
     },
     showEditForm(position) {
       this.isEditing = true;
       this.selectedPosition = position;
+      this.errors = {};
       this.isFormVisible = true;
     },
   },
@@ -77,23 +92,24 @@ export default {
 
 <template>
   <div class="content">
-  <h2>Должности</h2>
-  <CreateButton
-    :buttonName = buttonName
-    @create="showCreateForm"/>
+    <h2>Должности</h2>
+    <CreateButton
+        :buttonName="buttonName"
+        @create="showCreateForm"
+    />
     <PositionsTable
         :positions="positions"
         @edit="showEditForm"
         @delete="deletePosition"
     />
-
     <PositionForm
         v-if="isFormVisible"
         :position="selectedPosition"
         :isEditing="isEditing"
-        @update="updatePosition"
-        @create="createPosition"
-        @cancel="handleCancel"
+        :errors="errors"
+    @update="updatePosition"
+    @create="createPosition"
+    @cancel="handleCancel"
     />
   </div>
 </template>

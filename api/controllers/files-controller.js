@@ -38,6 +38,7 @@ exports.getFileById = async (req, res) => {
 };
 
 const path = require("path");
+const formatJoiErrors = require("../config/validation/joi-validation");
 
 exports.getRawFileById = async (req, res) => {
     try {
@@ -64,7 +65,7 @@ exports.createFile = async (req, res) => {
             employee_id: req.body.employee_id,
             file: req.file.filename
         }
-        await fileSchema.validateAsync(file, {context: {}});
+        const {error, value} = await fileSchema.validateAsync(file, {abortEarly: false});
         const fileId = await FilesModel.create(file);
         res.status(201).json({ message: "Файл создан" });
 
@@ -77,7 +78,8 @@ exports.createFile = async (req, res) => {
     } catch (error) {
         if (error.isJoi){
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);
@@ -94,7 +96,7 @@ exports.editFile = async (req, res) => {
             employee_id: req.body.employee_id,
             file: req.file.filename
         }
-        await fileSchema.validateAsync(file, {context: {id}});
+        const {error, value} = await fileSchema.validateAsync(file, {abortEarly: false});
         await FilesModel.edit(id, file);
         res.status(201).json({ message: "Файл изменён"});
 

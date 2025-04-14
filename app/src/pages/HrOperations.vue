@@ -17,6 +17,7 @@ export default {
       isFormVisible: false,
       isEditing: false,
       selectedHrOperation: null,
+      errors: {},
       buttonName: "кадровую операцию"
     };
   },
@@ -62,7 +63,12 @@ export default {
         await hrOperationsAPI.createHrOperation(hrOperationData);
         this.handleUpdate()
       } catch (error) {
-        console.error("Ошибка при добавлении данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     async deleteHrOperation(id) {
@@ -80,25 +86,34 @@ export default {
         await hrOperationsAPI.updateHrOperation(this.selectedHrOperation.id, hrOperationData)
         this.handleUpdate()
       } catch (error) {
-        console.error("Ошибка при обновлении данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     handleUpdate() {
       this.getHrOperations();
       this.isFormVisible = false;
+      this.errors = {};
     },
     handleCancel() {
       this.isFormVisible = false;
+      this.errors = {};
     },
     showCreateForm() {
       this.isEditing = false;
       this.selectedHrOperation = null;
       this.isFormVisible = true;
+      this.errors = {};
     },
     showEditForm(hrOperation) {
       this.isEditing = true;
       this.selectedHrOperation  = hrOperation;
       this.isFormVisible = true;
+      this.errors = {};
     },
   },
   mounted() {
@@ -131,6 +146,7 @@ export default {
         :positions="positions"
         :employees="employees"
         :isEditing="isEditing"
+        :errors ="errors"
         @update="updateHrOperation"
         @create="createHrOperation"
         @cancel="handleCancel"

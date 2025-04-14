@@ -1,9 +1,9 @@
 <script>
 export default {
-  props: ["organization", "isEditing"],
+  props: ["organization", "isEditing", "errors"],
   data() {
     return {
-      organizationData: { name: "" , comment: ""},
+      organizationData: { name: "" , comment: null},
     };
   },
   watch: {
@@ -11,18 +11,20 @@ export default {
       immediate: true,
       handler(newOrganization) {
         this.organizationData = { name: newOrganization?.name || "",
-          comment: newOrganization?.comment || ""};
+          comment: newOrganization?.comment || null};
       },
     },
   },
   methods: {
     async submitForm() {
-      if (!this.organizationData.name.trim()) return;
-
-      if (this.isEditing) {
-        this.$emit("update", { ...this.organizationData });
+      const data = {
+        name: this.organizationData.name.trim(),
+        comment: this.organizationData.comment?.trim() || null
+      };
+        if (this.isEditing) {
+        this.$emit("update", data);
       } else {
-        this.$emit("create", { ...this.organizationData });
+        this.$emit("create", data);
       }
     },
     cancelForm() {
@@ -37,7 +39,9 @@ export default {
   <div class="form-container">
     <h3>{{ isEditing ? "Редактировать организацию" : "Создать организацию" }}</h3>
     <input type="text" v-model="organizationData.name" placeholder="Название организации"/>
+    <p v-if="errors?.name" class="error">{{ errors.name }}</p>
     <input type="text" v-model="organizationData.comment" placeholder="Комментарий"/>
+    <p v-if="errors?.comment" class="error">{{ errors.comment }}</p>
     <button @click="submitForm">{{ isEditing ? "Сохранить" : "Добавить" }}</button>
     <button @click="cancelForm">Отмена</button>
   </div>
@@ -47,5 +51,10 @@ export default {
 .form-container {
   padding: 10px;
   border: 1px solid #ddd;
+}
+.error {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 4px;
 }
 </style>

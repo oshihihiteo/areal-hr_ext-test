@@ -16,6 +16,7 @@ export default {
       isFormVisible: false,
       isEditing: false,
       selectedFile: null,
+      errors: {},
       buttonName: "файл"
     };
   },
@@ -44,7 +45,12 @@ export default {
         console.log("Файл успешно загружен:", response.data);
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка при загрузке файла:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     async deleteFile(id) {
@@ -61,25 +67,34 @@ export default {
         await filesAPI.updateFile(this.selectedFile.id, fileData)
         this.handleUpdate()
       } catch (error) {
-        console.error("Ошибка при обновлении данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     handleUpdate() {
       this.getFiles();
       this.isFormVisible = false;
+      this.errors={};
     },
     handleCancel() {
       this.isFormVisible = false;
+      this.errors={};
     },
     showCreateForm() {
       this.isEditing = false;
       this.selectedFile = null;
       this.isFormVisible = true;
+      this.errors={};
     },
     showEditForm(file) {
       this.isEditing = true;
       this.selectedFile = file;
       this.isFormVisible = true;
+      this.errors={};
     },
   },
   mounted() {
@@ -107,6 +122,7 @@ export default {
         :file="selectedFile"
         :isEditing="isEditing"
         :employees="employees"
+        :errors="errors"
         @update="updateFile"
         @create="createFile"
         @cancel="handleCancel"

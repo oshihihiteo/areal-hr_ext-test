@@ -10,6 +10,7 @@ export default {
       employees: [],
       isFormVisible: false,
       isEditing: false,
+      errors: {},
       selectedEmployee: null,
       buttonName: "сотрудника"
     };
@@ -23,12 +24,16 @@ export default {
       }
     },
     async createEmployee(employeeData) {
-      console.log(employeeData)
       try {
         await employeesAPI.createEmployee(employeeData);
         this.handleUpdate()
       } catch (error) {
-        console.error("Ошибка при добавлении данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     async deleteEmployee(id) {
@@ -41,30 +46,38 @@ export default {
       }
     },
     async updateEmployee(employeeData) {
-      console.log(employeeData);
          try {
         await employeesAPI.updateEmployee(this.selectedEmployee.id, employeeData)
         this.handleUpdate()
       } catch (error) {
-        console.error("Ошибка при обновлении данных:", error.response ? error.response.data : error.message);
-      }
+           console.error("Ошибка:", error.response ? error.response.data : error.message);
+           const rawErrors = error.response?.data?.errors || [];
+           this.errors = rawErrors.reduce((acc, err) => {
+             acc[err.field] = err.message;
+             return acc;
+           }, {});
+         }
     },
     handleUpdate() {
       this.getEmployees();
       this.isFormVisible = false;
+      this.errors={};
     },
     handleCancel() {
       this.isFormVisible = false;
+      this.errors={};
     },
     showCreateForm() {
       this.isEditing = false;
       this.selectedEmployee = null;
       this.isFormVisible = true;
+      this.errors={};
     },
     showEditForm(employee) {
       this.isEditing = true;
       this.selectedEmployee = employee;
       this.isFormVisible = true;
+      this.errors={};
     },
   },
   mounted() {
@@ -90,6 +103,7 @@ export default {
         v-if="isFormVisible"
         :employee="selectedEmployee"
         :isEditing="isEditing"
+        :errors="errors"
         @update="updateEmployee"
         @create="createEmployee"
         @cancel="handleCancel"

@@ -8,15 +8,16 @@ const departmentSchema = Joi.object({
         'string.max': 'Название должно содержать не более 255 символов',
         'any.required': 'Название обязательно для заполнения'
     }),
-    organization_id: Joi.number().min(0).required().messages({
+    organization_id: Joi.number().integer().positive().required().messages({
         'number.base': 'ID организации должен быть числом',
         'any.required': 'ID организации обязательно для заполнения'
     }),
-    parent_id: Joi.number().allow(null).messages({
+    parent_id: Joi.number().integer().positive().allow(null).messages({
         'number.base': 'ID родительского отдела должен быть числом или null'
     }),
-    comment: Joi.string().messages({
-        'string.base': 'Комментарий должен быть строкой'
+    comment: Joi.string().allow(null).messages({
+        'string.base': 'Комментарий должен быть строкой',
+        'string.empty': 'Комментарий не может быть пустой строкой',
     })
 });
 

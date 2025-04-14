@@ -3,6 +3,7 @@ const Addresses = require("../models/addresses-model");
 const PassportData = require("../models/passport-data-model");
 const Changelog = require("./changelog-controller");
 const employeeSchema = require("../validationSchemas/employee-schema")
+const formatJoiErrors = require("../config/validation/joi-validation");
 
 exports.getAllEmployees = async (req, res) => {
     try {
@@ -27,7 +28,7 @@ exports.getEmployeeById = async (req, res) => {
 exports.createEmployee = async (req, res) => {
     try {
         const employee = req.body.employeeData;
-        await employeeSchema.validateAsync(employee);
+        const {error, value} = await employeeSchema.validateAsync(employee, { abortEarly: false });
 
         const addressData = {
             region: employee.address_region,
@@ -69,7 +70,8 @@ exports.createEmployee = async (req, res) => {
     } catch (error) {
         if (error.isJoi){
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);
@@ -103,7 +105,7 @@ exports.editEmployee = async (req, res) => {
     try {
         const employee = await Employees.getById(id);
         const data = req.body.employeeData;
-        await employeeSchema.validate(data);
+        const {error, value} = await employeeSchema.validateAsync(data, { abortEarly: false });
 
         const addressData = {
             region: data.address_region,
@@ -113,7 +115,7 @@ exports.editEmployee = async (req, res) => {
             building: data.address_building,
             apartment: data.address_apartment
         };
-        const addressId = await Addresses.edit(employee.address_id, addressData);
+        await Addresses.edit(employee.address_id, addressData);
 
         const passportData = {
             series: data.passport_series,
@@ -122,7 +124,7 @@ exports.editEmployee = async (req, res) => {
             unit_code: data.passport_unit_code,
             issued_by: data.passport_issued_by
         };
-        const passportDataId = await PassportData.edit(employee.passport_data_id, passportData);
+        await PassportData.edit(employee.passport_data_id, passportData);
 
         const employeeData = {
             lastname: data.lastname,
@@ -142,7 +144,8 @@ exports.editEmployee = async (req, res) => {
     } catch (error) {
         if (error.isJoi){
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);

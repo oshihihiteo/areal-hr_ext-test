@@ -1,7 +1,7 @@
 const Positions = require("../models/positions-model");
 const Changelog = require("./changelog-controller");
-const Joi = require('joi');
 const positionSchema = require('../validationSchemas/position-schema');
+const formatJoiErrors = require('../config/validation/joi-validation')
 
 exports.getAllPositions = async (req, res) => {
     try {
@@ -26,7 +26,7 @@ exports.getPositionById = async (req, res) => {
 exports.createPosition = async (req, res) => {
     try {
         const position = req.body.positionData;
-        await positionSchema.validateAsync(position, { context: {} });
+        const {error, value} = await positionSchema.validateAsync(position, { context:{}, abortEarly: false });
         const positionId = await Positions.create(position);
         res.status(200).json({ message: "Должность добавлена." });
 
@@ -39,7 +39,8 @@ exports.createPosition = async (req, res) => {
     } catch (error) {
         if (error.isJoi) {
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);
@@ -72,7 +73,7 @@ exports.editPosition = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
         const position = req.body.positionData;
-        await positionSchema.validateAsync(position, { context: {id} });
+        const {error, value} = await positionSchema.validateAsync(position, { context:{id}, abortEarly: false });
         await Positions.edit(id, position);
         res.status(200).json({ message: "Должность изменена." });
 
@@ -85,7 +86,8 @@ exports.editPosition = async (req, res) => {
     } catch (error) {
         if (error.isJoi) {
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);

@@ -14,6 +14,7 @@ export default {
       isFormVisible: false,
       isEditing: false,
       selectedDepartment: null,
+      errors: {},
       buttonName: "отдел"
     };
   },
@@ -42,39 +43,51 @@ export default {
       }
     },
     async createDepartment(departmentData) {
-      if (!departmentData.name.trim()) return;
       try {
         await departmentAPI.createDepartment(departmentData);
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка при отправке данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     async updateDepartment(departmentData) {
-      if (!departmentData.name.trim()) return;
       try {
         await departmentAPI.updateDepartment(this.selectedDepartment.id, departmentData)
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка при отправке данных:", error.response ? error.response.data : error.message);
+        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
       }
     },
     showCreateForm() {
       this.isEditing = false;
       this.selectedDepartment = null;
       this.isFormVisible = true;
+      this.errors={};
     },
     showEditForm(department) {
       this.isEditing = true;
       this.selectedDepartment = department;
       this.isFormVisible = true;
+      this.errors={};
     },
     handleUpdate() {
       this.getDepartments();
       this.isFormVisible = false;
+      this.errors={};
     },
     handleCancel() {
       this.isFormVisible = false;
+      this.errors={};
     },
   },
   mounted() {
@@ -105,6 +118,7 @@ export default {
         :departments="departments"
         :organizations="organizations"
         :isEditing="isEditing"
+        :errors="errors"
         @update="updateDepartment"
         @create="createDepartment"
         @cancel="handleCancel"

@@ -29,10 +29,6 @@ const hrOperationSchema = Joi.object({
         'number.integer': 'ID отдела должен быть целым числом',
         'number.positive': 'ID отдела должен быть положительным числом',
         'any.required': 'ID отдела обязателен для заполнения'
-    }),
-    created_at: Joi.date().raw().required().messages({
-        'date.base': 'Дата создания должна быть корректной датой)',
-        'any.required': 'Дата создания обязательна для заполнения'
     })
 });
 

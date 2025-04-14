@@ -1,6 +1,7 @@
 const Departments = require("../models/departments-model");
 const departmentSchema = require("../validationSchemas/department-schema");
 const Changelog = require("./changelog-controller");
+const formatJoiErrors = require("../config/validation/joi-validation");
 
 exports.getAllDepartments = async (req, res) => {
     try {
@@ -23,21 +24,25 @@ exports.getDepartmentById = async (req, res) => {
 };
 
 exports.createDepartment = async (req, res) => {
-    const { error } = departmentSchema.validate(req.body.departmentData);
-    if (error) {
-        return res.status(400).json({ message: 'Ошибка валидации данных: ' + error.details[0].message });
-    }
     try {
-        const department = await Departments.create(req.body.departmentData);
+        const department = req.body.departmentData;
+        const { error, value } = await departmentSchema.validateAsync(department, {abortEarly: false});
+        const departmentId = await Departments.create(department);
         res.status(200).json({ message: "Отдел добавлен." });
 
         const changelog = {
             object_type_id: 2,
-            object_id: department,
-            changed_fields: req.body.departmentData
+            object_id: departmentId,
+            changed_fields: department
         };
         await Changelog.createChangelog(changelog);
     } catch (error) {
+        if (error.isJoi){
+            return res.status(400).json({
+                status: 'error',
+                errors: formatJoiErrors(error)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при добавлении отдела: ", error });
     }
@@ -63,23 +68,26 @@ exports.deleteDepartment = async (req, res) => {
 
 exports.editDepartment = async (req, res) => {
     const id = parseInt(req.params.id);
-    const { error } = departmentSchema.validate(req.body.departmentData);
-    if (error) {
-        return res.status(400).json({ message: 'Ошибка валидации данных: ' + error.details[0].message });
-    }
     try {
-        const department = await Departments.edit(id, req.body.departmentData
-        );
+        const department = req.body.departmentData;
+        const { error, value } = await departmentSchema.validateAsync(department, {abortEarly: false});
+        await Departments.edit(id, department);
         res.status(200).json({ message: "Данные отдела изменены." });
 
         const changelog = {
             object_type_id: 2,
             object_id: id,
-            changed_fields: req.body.departmentData
+            changed_fields: department
         };
         await Changelog.editChangelog(changelog);
 
     } catch (error) {
+        if (error.isJoi){
+            return res.status(400).json({
+                status: 'error',
+                errors: formatJoiErrors(error)
+            });
+        }
         console.error(error);
         res.status(500).json({ message: "Ошибка при изменении отдела: ", error });
     }

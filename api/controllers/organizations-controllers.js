@@ -1,7 +1,7 @@
 const Organizations = require("../models/organizations-model");
-const Joi = require('joi');
 const organizationSchema = require('../validationSchemas/organization-schema');
 const Changelog = require("./changelog-controller");
+const formatJoiErrors = require('../config/validation/joi-validation')
 
 exports.getAllOrganizations = async (req, res) => {
     try {
@@ -26,7 +26,7 @@ exports.getOrganizationById = async (req, res) => {
 exports.createOrganization = async (req, res) => {
     try {
         const organization = req.body.organizationData;
-        await organizationSchema.validateAsync(organization, {context: {}});
+        const {error, value} = await organizationSchema.validateAsync(organization, {context: {}, abortEarly: false });
         const organizationId = await Organizations.create(organization);
         res.status(200).json({message: "Организация добавлена."});
 
@@ -39,7 +39,8 @@ exports.createOrganization = async (req, res) => {
     } catch (error){
         if (error.isJoi){
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);
@@ -69,7 +70,7 @@ exports.editOrganization = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
         const organization = req.body.organizationData;
-        await organizationSchema.validateAsync(organization, {context: {id}});
+        const {error, value} = await organizationSchema.validateAsync(organization, {context: {id}, abortEarly: false });
         await Organizations.edit(id, organization);
         res.status(200).json({message: "Организация изменена."});
 
@@ -82,7 +83,8 @@ exports.editOrganization = async (req, res) => {
     } catch (error){
         if (error.isJoi){
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);

@@ -1,6 +1,7 @@
 const HR_operations = require("../models/hr-operations-model");
 const Changelog = require("./changelog-controller");
 const  hrOperationSchema = require("../validationSchemas/hr-operations-schema")
+const formatJoiErrors = require("../config/validation/joi-validation");
 
 exports.getAllHrOperations = async (req, res) => {
     try {
@@ -14,7 +15,7 @@ exports.getAllHrOperations = async (req, res) => {
 exports.createHrOperation = async (req, res) => {
     try {
         const hrOperation = req.body.hrOperationData;
-        await hrOperationSchema.validateAsync(hrOperation)
+        const {error, value} = await hrOperationSchema.validateAsync(hrOperation, {abortEarly: false})
         const hrOperationId = await HR_operations.create(hrOperation);
         res.status(200).json({ message: "Кадровая операция добавлен." });
 
@@ -28,7 +29,8 @@ exports.createHrOperation = async (req, res) => {
     } catch (error) {
         if (error.isJoi){
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);
@@ -60,7 +62,7 @@ exports.editHrOperation = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
         const hrOperation = req.body.hrOperationData;
-        await hrOperationSchema.validateAsync(hrOperation);
+        const {error, value} = await hrOperationSchema.validateAsync(hrOperation, {abortEarly: false});
         await HR_operations.edit(id,hrOperation);
         res.status(200).json({ message: "Данные кадровой операции изменены." });
 
@@ -74,7 +76,8 @@ exports.editHrOperation = async (req, res) => {
     } catch (error) {
         if(error.isJoi) {
             return res.status(400).json({
-                message: 'Ошибка валидации данных: ' + (error.details?.[0]?.message || error.message)
+                status: 'error',
+                errors: formatJoiErrors(error)
             });
         }
         console.error(error);

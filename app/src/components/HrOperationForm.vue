@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["hrOperation", "employees", "positions", "departments", "actions", "isEditing"],
+  props: ["hrOperation", "employees", "positions", "departments", "actions", "isEditing", "errors"],
   data() {
     return {
       hrOperationData:     {
@@ -52,9 +52,10 @@ export default {
           <option disabled value="">Выберите сотрудника</option>
           <option v-for="employee in employees" :key="employee.id" :value="employee.id">
             {{ employee.lastname }} {{ employee.firstname }} {{ employee.patronymic }},
-            отдел - {{ employee.department_name}}, должность - {{ employee.position_name}}
+            отдел - {{ employee.department_name }}, должность - {{ employee.position_name }}
           </option>
         </select>
+        <p v-if="errors?.employee_id" class="error">{{ errors.employee_id }}</p>
       </div>
 
       <div>
@@ -65,6 +66,7 @@ export default {
             {{ action.name }}
           </option>
         </select>
+        <p v-if="errors?.action_id" class="error">{{ errors.action_id }}</p>
       </div>
 
       <div>
@@ -75,6 +77,7 @@ export default {
             {{ department.name }}
           </option>
         </select>
+        <p v-if="errors?.department_id" class="error">{{ errors.department_id }}</p>
       </div>
 
       <div>
@@ -85,6 +88,7 @@ export default {
             {{ position.name }}
           </option>
         </select>
+        <p v-if="errors?.position_id" class="error">{{ errors.position_id }}</p>
       </div>
 
       <div>
@@ -95,6 +99,7 @@ export default {
             v-model="hrOperationData.salary"
             required
         />
+        <p v-if="errors?.salary" class="error">{{ errors.salary }}</p>
       </div>
 
       <div class="form-buttons">
@@ -105,10 +110,14 @@ export default {
   </div>
 </template>
 
-
 <style scoped>
 .form-container {
   padding: 10px;
   border: 1px solid #ddd;
+}
+.error {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 4px;
 }
 </style>
