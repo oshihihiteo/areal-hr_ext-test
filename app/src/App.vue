@@ -11,11 +11,13 @@
 nav {
   padding: 10px;
 }
+
 nav a {
   margin-right: 10px;
   text-decoration: none;
   color: blue;
 }
+
 .app-container {
   display: flex;
 }
@@ -28,11 +30,10 @@ nav a {
 </style>
 
 <script>
-import {defineComponent} from "vue";
+import { defineComponent } from "vue";
 import NavigationBar from "@/components/NavigationBar.vue";
 
 export default defineComponent({
-  components: {NavigationBar}
-})
+  components: { NavigationBar },
+});
 </script>
-

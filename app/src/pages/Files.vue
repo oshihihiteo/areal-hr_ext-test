@@ -1,11 +1,10 @@
 <script>
-import * as filesAPI from '../instances/files.js';
+import * as filesAPI from "../instances/files.js";
 import CreateButton from "@/components/CreateButton.vue";
 import FilesTable from "@/components/FilesTable.vue";
 import FileForm from "@/components/FileForm.vue";
 import axiosInstance from "@/instances/baseURL.js";
-import * as dropdownListAPI from '../instances/dropdown-list-options.js'
-
+import * as dropdownListAPI from "../instances/dropdown-list-options.js";
 
 export default {
   components: { FileForm, FilesTable, CreateButton },
@@ -17,7 +16,7 @@ export default {
       isEditing: false,
       selectedFile: null,
       errors: {},
-      buttonName: "файл"
+      buttonName: "файл",
     };
   },
   methods: {
@@ -30,7 +29,8 @@ export default {
     },
     async getEmployees() {
       try {
-        this.employees = await dropdownListAPI.getEmployeesWithDepartmentsAndPositions();
+        this.employees =
+          await dropdownListAPI.getEmployeesWithDepartmentsAndPositions();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
@@ -45,7 +45,10 @@ export default {
         console.log("Файл успешно загружен:", response.data);
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -64,10 +67,13 @@ export default {
     },
     async updateFile(fileData) {
       try {
-        await filesAPI.updateFile(this.selectedFile.id, fileData)
-        this.handleUpdate()
+        await filesAPI.updateFile(this.selectedFile.id, fileData);
+        this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -78,28 +84,28 @@ export default {
     handleUpdate() {
       this.getFiles();
       this.isFormVisible = false;
-      this.errors={};
+      this.errors = {};
     },
     handleCancel() {
       this.isFormVisible = false;
-      this.errors={};
+      this.errors = {};
     },
     showCreateForm() {
       this.isEditing = false;
       this.selectedFile = null;
       this.isFormVisible = true;
-      this.errors={};
+      this.errors = {};
     },
     showEditForm(file) {
       this.isEditing = true;
       this.selectedFile = file;
       this.isFormVisible = true;
-      this.errors={};
+      this.errors = {};
     },
   },
   mounted() {
     this.getFiles();
-    this.getEmployees()
+    this.getEmployees();
   },
 };
 </script>
@@ -107,28 +113,25 @@ export default {
 <template>
   <div class="content">
     <h2>Файлы</h2>
-    <CreateButton
-        :buttonName = buttonName
-        @create="showCreateForm"/>
+    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
     <FilesTable
-        :files="files"
-        @edit="showEditForm"
-        @delete="deleteFile"
-        @open="openFile"
+      :files="files"
+      @edit="showEditForm"
+      @delete="deleteFile"
+      @open="openFile"
     />
 
     <FileForm
-        v-if="isFormVisible"
-        :file="selectedFile"
-        :isEditing="isEditing"
-        :employees="employees"
-        :errors="errors"
-        @update="updateFile"
-        @create="createFile"
-        @cancel="handleCancel"
+      v-if="isFormVisible"
+      :file="selectedFile"
+      :isEditing="isEditing"
+      :employees="employees"
+      :errors="errors"
+      @update="updateFile"
+      @create="createFile"
+      @cancel="handleCancel"
     />
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

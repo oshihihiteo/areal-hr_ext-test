@@ -1,13 +1,12 @@
 <script>
-import * as changelogAPI from '../instances/changelog.js';
+import * as changelogAPI from "../instances/changelog.js";
 import ChangelogTable from "@/components/ChangelogTable.vue";
 
-
 export default {
-  components: {ChangelogTable},
+  components: { ChangelogTable },
   data() {
     return {
-      changelogs: []
+      changelogs: [],
     };
   },
   methods: {
@@ -28,12 +27,8 @@ export default {
 <template>
   <div class="content">
     <h2>История изменений</h2>
-    <ChangelogTable
-        :changelogs="changelogs"
-    />
+    <ChangelogTable :changelogs="changelogs" />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

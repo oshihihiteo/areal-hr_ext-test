@@ -3,42 +3,42 @@ const client = require("../config/db");
 class EmployeesModel {
     static async getAll() {
         const result = await client.query(`
-        SELECT
-            e.id,
-            e.lastname, e.firstname, e.patronymic, e.birth_date,
-            pd.series AS passport_series,
-            pd.number AS passport_number,
-            pd.issued_date AS passport_issued_date,
-            pd.unit_code AS passport_unit_code,
-            pd.issued_by AS passport_issued_by,
-            a.region AS address_region,
-            a.settlement AS address_settlement,
-            a.street AS address_street,
-            a.house AS address_house,
-            a.building AS address_building,
-            a.apartment AS address_apartment,
-            p.id AS position_id,
-            p.name AS position_name,
-            d.id AS department_id,
-            d.name AS department_name,
-            ac.id AS action_id,
-            ac.name AS action_name,
-            ho.salary AS last_salary,
-            ho.created_at AS last_operation_date,
-            ho.position_id,
-            ho.department_id,
-            ho.action_id
-        FROM employees e
-                 JOIN passport_data pd ON e.passport_data_id = pd.id
-                 JOIN addresses a ON e.address_id = a.id
-                 LEFT JOIN (
-            SELECT DISTINCT ON (employee_id) *
-            FROM hr_operations
-            ORDER BY employee_id, created_at DESC
-        ) ho ON e.id = ho.employee_id
-                 LEFT JOIN actions ac ON ho.action_id = ac.id
-                 LEFT JOIN departments d ON ho.department_id = d.id
-                 LEFT JOIN positions p ON ho.position_id = p.id;
+            SELECT e.id,
+                   e.lastname,
+                   e.firstname,
+                   e.patronymic,
+                   e.birth_date,
+                   pd.series      AS passport_series,
+                   pd.number      AS passport_number,
+                   pd.issued_date AS passport_issued_date,
+                   pd.unit_code   AS passport_unit_code,
+                   pd.issued_by   AS passport_issued_by,
+                   a.region       AS address_region,
+                   a.settlement   AS address_settlement,
+                   a.street       AS address_street,
+                   a.house        AS address_house,
+                   a.building     AS address_building,
+                   a.apartment    AS address_apartment,
+                   p.id           AS position_id,
+                   p.name         AS position_name,
+                   d.id           AS department_id,
+                   d.name         AS department_name,
+                   ac.id          AS action_id,
+                   ac.name        AS action_name,
+                   ho.salary      AS last_salary,
+                   ho.created_at  AS last_operation_date,
+                   ho.position_id,
+                   ho.department_id,
+                   ho.action_id
+            FROM employees e
+                     JOIN passport_data pd ON e.passport_data_id = pd.id
+                     JOIN addresses a ON e.address_id = a.id
+                     LEFT JOIN (SELECT DISTINCT ON (employee_id) *
+                                FROM hr_operations
+                                ORDER BY employee_id, created_at DESC) ho ON e.id = ho.employee_id
+                     LEFT JOIN actions ac ON ho.action_id = ac.id
+                     LEFT JOIN departments d ON ho.department_id = d.id
+                     LEFT JOIN positions p ON ho.position_id = p.id;
 
         `);
         return result.rows;

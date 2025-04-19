@@ -1,10 +1,11 @@
 <script>
-import * as employeesAPI from '../instances/employees.js';
+import * as employeesAPI from "../instances/employees.js";
 import CreateButton from "@/components/CreateButton.vue";
 import EmployeesTable from "@/components/EmployeesTable.vue";
 import EmployeeForm from "@/components/EmployeeForm.vue";
+
 export default {
-  components: {EmployeeForm, EmployeesTable, CreateButton },
+  components: { EmployeeForm, EmployeesTable, CreateButton },
   data() {
     return {
       employees: [],
@@ -12,7 +13,7 @@ export default {
       isEditing: false,
       errors: {},
       selectedEmployee: null,
-      buttonName: "сотрудника"
+      buttonName: "сотрудника",
     };
   },
   methods: {
@@ -26,9 +27,12 @@ export default {
     async createEmployee(employeeData) {
       try {
         await employeesAPI.createEmployee(employeeData);
-        this.handleUpdate()
+        this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -46,38 +50,44 @@ export default {
       }
     },
     async updateEmployee(employeeData) {
-         try {
-        await employeesAPI.updateEmployee(this.selectedEmployee.id, employeeData)
-        this.handleUpdate()
+      try {
+        await employeesAPI.updateEmployee(
+          this.selectedEmployee.id,
+          employeeData,
+        );
+        this.handleUpdate();
       } catch (error) {
-           console.error("Ошибка:", error.response ? error.response.data : error.message);
-           const rawErrors = error.response?.data?.errors || [];
-           this.errors = rawErrors.reduce((acc, err) => {
-             acc[err.field] = err.message;
-             return acc;
-           }, {});
-         }
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
+        const rawErrors = error.response?.data?.errors || [];
+        this.errors = rawErrors.reduce((acc, err) => {
+          acc[err.field] = err.message;
+          return acc;
+        }, {});
+      }
     },
     handleUpdate() {
       this.getEmployees();
       this.isFormVisible = false;
-      this.errors={};
+      this.errors = {};
     },
     handleCancel() {
       this.isFormVisible = false;
-      this.errors={};
+      this.errors = {};
     },
     showCreateForm() {
       this.isEditing = false;
       this.selectedEmployee = null;
       this.isFormVisible = true;
-      this.errors={};
+      this.errors = {};
     },
     showEditForm(employee) {
       this.isEditing = true;
       this.selectedEmployee = employee;
       this.isFormVisible = true;
-      this.errors={};
+      this.errors = {};
     },
   },
   mounted() {
@@ -89,27 +99,24 @@ export default {
 <template>
   <div class="content">
     <h2>Сотрудники</h2>
-    <CreateButton
-        :buttonName = buttonName
-        @create="showCreateForm"/>
+    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
 
     <EmployeesTable
-        :employees="employees"
-        @edit="showEditForm"
-        @delete="deleteEmployee"
+      :employees="employees"
+      @edit="showEditForm"
+      @delete="deleteEmployee"
     />
 
     <EmployeeForm
-        v-if="isFormVisible"
-        :employee="selectedEmployee"
-        :isEditing="isEditing"
-        :errors="errors"
-        @update="updateEmployee"
-        @create="createEmployee"
-        @cancel="handleCancel"
+      v-if="isFormVisible"
+      :employee="selectedEmployee"
+      :isEditing="isEditing"
+      :errors="errors"
+      @update="updateEmployee"
+      @create="createEmployee"
+      @cancel="handleCancel"
     />
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

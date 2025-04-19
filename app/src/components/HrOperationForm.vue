@@ -1,27 +1,35 @@
 <script>
 export default {
-  props: ["hrOperation", "employees", "positions", "departments", "actions", "isEditing", "errors"],
+  props: [
+    "hrOperation",
+    "employees",
+    "positions",
+    "departments",
+    "actions",
+    "isEditing",
+    "errors",
+  ],
   data() {
     return {
-      hrOperationData:     {
+      hrOperationData: {
         employee_id: "",
         action_id: "",
         salary: "",
         position_id: "",
-        department_id: ""
-      }
-      };
+        department_id: "",
+      },
+    };
   },
   watch: {
     hrOperation: {
       immediate: true,
       handler(newHrOperation) {
         this.hrOperationData = {
-              employee_id: newHrOperation?.employee_id || "",
-              action_id: newHrOperation?.action_id || "",
-              salary: newHrOperation?.salary || "",
-              position_id: newHrOperation?.position_id || "",
-              department_id: newHrOperation?.department_id || ""
+          employee_id: newHrOperation?.employee_id || "",
+          action_id: newHrOperation?.action_id || "",
+          salary: newHrOperation?.salary || "",
+          position_id: newHrOperation?.position_id || "",
+          department_id: newHrOperation?.department_id || "",
         };
       },
     },
@@ -43,16 +51,27 @@ export default {
 
 <template>
   <div class="form-container">
-    <h3>{{ isEditing ? "Редактировать кадровую операцию" : "Добавить кадровую операцию" }}</h3>
+    <h3>
+      {{
+        isEditing
+          ? "Редактировать кадровую операцию"
+          : "Добавить кадровую операцию"
+      }}
+    </h3>
 
     <form @submit.prevent="submitForm">
       <div>
         <label for="employee">Сотрудник:</label>
         <select v-model="hrOperationData.employee_id" id="employee" required>
           <option disabled value="">Выберите сотрудника</option>
-          <option v-for="employee in employees" :key="employee.id" :value="employee.id">
-            {{ employee.lastname }} {{ employee.firstname }} {{ employee.patronymic }},
-            отдел - {{ employee.department_name }}, должность - {{ employee.position_name }}
+          <option
+            v-for="employee in employees"
+            :key="employee.id"
+            :value="employee.id"
+          >
+            {{ employee.lastname }} {{ employee.firstname }}
+            {{ employee.patronymic }}, отдел - {{ employee.department_name }},
+            должность - {{ employee.position_name }}
           </option>
         </select>
         <p v-if="errors?.employee_id" class="error">{{ errors.employee_id }}</p>
@@ -71,20 +90,34 @@ export default {
 
       <div>
         <label for="department">Отдел:</label>
-        <select v-model="hrOperationData.department_id" id="department" required>
+        <select
+          v-model="hrOperationData.department_id"
+          id="department"
+          required
+        >
           <option disabled value="">Выберите отдел</option>
-          <option v-for="department in departments" :key="department.id" :value="department.id">
+          <option
+            v-for="department in departments"
+            :key="department.id"
+            :value="department.id"
+          >
             {{ department.name }}
           </option>
         </select>
-        <p v-if="errors?.department_id" class="error">{{ errors.department_id }}</p>
+        <p v-if="errors?.department_id" class="error">
+          {{ errors.department_id }}
+        </p>
       </div>
 
       <div>
         <label for="position">Позиция:</label>
         <select v-model="hrOperationData.position_id" id="position" required>
           <option disabled value="">Выберите позицию</option>
-          <option v-for="position in positions" :key="position.id" :value="position.id">
+          <option
+            v-for="position in positions"
+            :key="position.id"
+            :value="position.id"
+          >
             {{ position.name }}
           </option>
         </select>
@@ -94,16 +127,18 @@ export default {
       <div>
         <label for="salary">Зарплата:</label>
         <input
-            type="number"
-            id="salary"
-            v-model="hrOperationData.salary"
-            required
+          type="number"
+          id="salary"
+          v-model="hrOperationData.salary"
+          required
         />
         <p v-if="errors?.salary" class="error">{{ errors.salary }}</p>
       </div>
 
       <div class="form-buttons">
-        <button type="submit">{{ isEditing ? "Сохранить" : "Добавить" }}</button>
+        <button type="submit">
+          {{ isEditing ? "Сохранить" : "Добавить" }}
+        </button>
         <button type="button" @click="cancelForm">Отмена</button>
       </div>
     </form>
@@ -115,6 +150,7 @@ export default {
   padding: 10px;
   border: 1px solid #ddd;
 }
+
 .error {
   color: red;
   font-size: 0.9em;

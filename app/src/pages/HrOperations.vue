@@ -1,6 +1,6 @@
 <script>
-import * as hrOperationsAPI from '../instances/hr-operations.js';
-import * as dropdownListAPI from '../instances/dropdown-list-options.js'
+import * as hrOperationsAPI from "../instances/hr-operations.js";
+import * as dropdownListAPI from "../instances/dropdown-list-options.js";
 import HrOperationForm from "../components/HrOperationForm.vue";
 import HrOperationsTable from "../components/HrOperationsTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
@@ -18,7 +18,7 @@ export default {
       isEditing: false,
       selectedHrOperation: null,
       errors: {},
-      buttonName: "кадровую операцию"
+      buttonName: "кадровую операцию",
     };
   },
   methods: {
@@ -29,41 +29,45 @@ export default {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
-    async getEmployees(){
-      try{
-        this.employees = await dropdownListAPI.getEmployeesWithDepartmentsAndPositions()
-      } catch (error) {
-      console.error("Ошибка при загрузке данных:", error);
-      }
-    },
-    async getDepartments(){
-      try{
-        this.departments = await dropdownListAPI.getDepartmentsNames()
+    async getEmployees() {
+      try {
+        this.employees =
+          await dropdownListAPI.getEmployeesWithDepartmentsAndPositions();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
-    async getPositions(){
-      try{
-        this.positions = await dropdownListAPI.getPositionsNames()
+    async getDepartments() {
+      try {
+        this.departments = await dropdownListAPI.getDepartmentsNames();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
-    async getActions(){
-      try{
-        this.actions = await dropdownListAPI.getActionsNames()
+    async getPositions() {
+      try {
+        this.positions = await dropdownListAPI.getPositionsNames();
+      } catch (error) {
+        console.error("Ошибка при загрузке данных:", error);
+      }
+    },
+    async getActions() {
+      try {
+        this.actions = await dropdownListAPI.getActionsNames();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
     async createHrOperation(hrOperationData) {
-      console.log(hrOperationData)
+      console.log(hrOperationData);
       try {
         await hrOperationsAPI.createHrOperation(hrOperationData);
-        this.handleUpdate()
+        this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -81,12 +85,17 @@ export default {
       }
     },
     async updateHrOperation(hrOperationData) {
-
       try {
-        await hrOperationsAPI.updateHrOperation(this.selectedHrOperation.id, hrOperationData)
-        this.handleUpdate()
+        await hrOperationsAPI.updateHrOperation(
+          this.selectedHrOperation.id,
+          hrOperationData,
+        );
+        this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -111,7 +120,7 @@ export default {
     },
     showEditForm(hrOperation) {
       this.isEditing = true;
-      this.selectedHrOperation  = hrOperation;
+      this.selectedHrOperation = hrOperation;
       this.isFormVisible = true;
       this.errors = {};
     },
@@ -129,30 +138,27 @@ export default {
 <template>
   <div class="content">
     <h2>Кадровые операции</h2>
-    <CreateButton
-        :buttonName = buttonName
-        @create="showCreateForm"/>
+    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
     <HrOperationsTable
-        :hrOperations="hrOperations"
-        @edit="showEditForm"
-        @delete="deleteHrOperation"
+      :hrOperations="hrOperations"
+      @edit="showEditForm"
+      @delete="deleteHrOperation"
     />
 
     <HrOperationForm
-        v-if="isFormVisible"
-        :hrOperation="selectedHrOperation"
-        :actions = "actions"
-        :departments="departments"
-        :positions="positions"
-        :employees="employees"
-        :isEditing="isEditing"
-        :errors ="errors"
-        @update="updateHrOperation"
-        @create="createHrOperation"
-        @cancel="handleCancel"
+      v-if="isFormVisible"
+      :hrOperation="selectedHrOperation"
+      :actions="actions"
+      :departments="departments"
+      :positions="positions"
+      :employees="employees"
+      :isEditing="isEditing"
+      :errors="errors"
+      @update="updateHrOperation"
+      @create="createHrOperation"
+      @cancel="handleCancel"
     />
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

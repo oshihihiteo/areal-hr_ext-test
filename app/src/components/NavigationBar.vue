@@ -1,13 +1,21 @@
 <template>
   <div class="navbar">
     <nav>
-      <router-link to="/positions">Должности</router-link> <br>
-      <router-link to="/organizations">Организации</router-link> <br>
-      <router-link to="/departments">Отделы</router-link> <br>
-      <router-link to="/employees">Сотрудники</router-link> <br>
-      <router-link to="/hr-operations">Кадровые операции</router-link> <br>
-      <router-link to="/changelog">История изменений</router-link> <br>
+      <router-link to="/positions">Должности</router-link>
+      <br />
+      <router-link to="/organizations">Организации</router-link>
+      <br />
+      <router-link to="/departments">Отделы</router-link>
+      <br />
+      <router-link to="/employees">Сотрудники</router-link>
+      <br />
+      <router-link to="/hr-operations">Кадровые операции</router-link>
+      <br />
+      <router-link to="/changelog">История изменений</router-link>
+      <br />
       <router-link to="/files">Файлы</router-link>
+      <br />
+      <router-link to="/users">Пользователи</router-link>
     </nav>
   </div>
 </template>
@@ -40,5 +48,4 @@
   background-color: #c1c3cb;
 }
 </style>
-<script setup>
-</script>
+<script setup></script>

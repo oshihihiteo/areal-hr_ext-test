@@ -1,11 +1,11 @@
 <script>
-import * as organizationAPI from '../instances/organizations.js';
+import * as organizationAPI from "../instances/organizations.js";
 import OrganizationForm from "../components/OrganizationForm.vue";
 import OrganizationsTable from "../components/OrganizationsTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
 
 export default {
-  components: {OrganizationForm, OrganizationsTable, CreateButton },
+  components: { OrganizationForm, OrganizationsTable, CreateButton },
   data() {
     return {
       organizations: [],
@@ -13,7 +13,7 @@ export default {
       isEditing: false,
       selectedOrganization: null,
       errors: {},
-      buttonName: "организацию"
+      buttonName: "организацию",
     };
   },
   methods: {
@@ -36,10 +36,13 @@ export default {
     },
     async createOrganization(organizationData) {
       try {
-          await organizationAPI.createOrganization(organizationData);
+        await organizationAPI.createOrganization(organizationData);
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
 
         this.errors = rawErrors.reduce((acc, err) => {
@@ -50,10 +53,16 @@ export default {
     },
     async updateOrganization(organizationData) {
       try {
-        await organizationAPI.updateOrganization(this.selectedOrganization.id, organizationData)
+        await organizationAPI.updateOrganization(
+          this.selectedOrganization.id,
+          organizationData,
+        );
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
 
         this.errors = rawErrors.reduce((acc, err) => {
@@ -93,29 +102,24 @@ export default {
 <template>
   <div class="content">
     <h2>Организации</h2>
-    <CreateButton
-        :buttonName = buttonName
-        @create="showCreateForm"
-    />
+    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
 
     <OrganizationsTable
-        :organizations="organizations"
-        @edit="showEditForm"
-        @delete="deleteOrganization"
+      :organizations="organizations"
+      @edit="showEditForm"
+      @delete="deleteOrganization"
     />
 
     <OrganizationForm
-        v-if="isFormVisible"
-        :organization="selectedOrganization"
-        :isEditing="isEditing"
-        :errors="errors"
-        @update="updateOrganization"
-        @create="createOrganization"
-        @cancel="handleCancel"
+      v-if="isFormVisible"
+      :organization="selectedOrganization"
+      :isEditing="isEditing"
+      :errors="errors"
+      @update="updateOrganization"
+      @create="createOrganization"
+      @cancel="handleCancel"
     />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -37,9 +37,10 @@ class FilesModel {
 
     static async findByName(fileName, id) {
         const query = `
-            SELECT * FROM files 
-            WHERE name = $1 
-            AND ($2::int IS NULL OR id != $2)`;
+            SELECT *
+            FROM files
+            WHERE name = $1
+              AND ($2::int IS NULL OR id != $2)`;
         const params = [fileName, id];
         const result = await client.query(query, params);
         return result.rows[0] || null;

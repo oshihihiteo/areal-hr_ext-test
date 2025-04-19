@@ -2,12 +2,20 @@ const client = require("../config/db");
 
 class ChangelogModel {
     static async getAll() {
-        const result = await client.query(`SELECT c.id, 
-    c.date_and_time, u.lastname, u.firstname, u.patronymic, ot.name, 
-    c.object_id, c.changed_fields, c.created_at, c.updated_at, c.deleted_at
-    FROM changelog c
-    LEFT JOIN object_types ot ON c.object_type_id = ot.id
-    LEFT JOIN users u ON c.user_id = u.id`);
+        const result = await client.query(`SELECT c.id,
+                                                  c.date_and_time,
+                                                  u.lastname,
+                                                  u.firstname,
+                                                  u.patronymic,
+                                                  ot.name,
+                                                  c.object_id,
+                                                  c.changed_fields,
+                                                  c.created_at,
+                                                  c.updated_at,
+                                                  c.deleted_at
+                                           FROM changelog c
+                                                    LEFT JOIN object_types ot ON c.object_type_id = ot.id
+                                                    LEFT JOIN users u ON c.user_id = u.id`);
         return result.rows;
     }
 

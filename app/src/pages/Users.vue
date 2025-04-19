@@ -1,37 +1,39 @@
 <script>
-import * as positionAPI from "../instances/positions.js";
-import PositionForm from "../components/PositionForm.vue";
-import PositionsTable from "../components/PositionsTable.vue";
+import * as userAPI from "../instances/users.js";
+import UserForm from "../components/UserForm.vue";
+import UsersTable from "../components/UsersTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
+import {limitUser} from "../instances/users.js";
 
 export default {
-  components: { PositionForm, PositionsTable, CreateButton },
+  components: { UserForm, UsersTable, CreateButton },
   data() {
     return {
-      positions: [],
+      users: [],
       isFormVisible: false,
       isEditing: false,
-      selectedPosition: null,
+      selectedUser: null,
       errors: {},
-      buttonName: "должность",
+      buttonName: "пользователя",
     };
   },
   methods: {
-    async getPositions() {
+    limitUser,
+    async getUsers() {
       try {
-        this.positions = await positionAPI.getPositions();
+        this.users = await userAPI.getUsers();
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
     },
-    async createPosition(positionData) {
+    async createUser(userData) {
       try {
-        await positionAPI.createPosition(positionData);
+        await userAPI.createUser(userData);
         this.handleUpdate();
       } catch (error) {
         console.error(
-          "Ошибка:",
-          error.response ? error.response.data : error.message,
+            "Ошибка:",
+            error.response ? error.response.data : error.message,
         );
         const rawErrors = error.response?.data?.errors || [];
 
@@ -41,26 +43,26 @@ export default {
         }, {});
       }
     },
-    async deletePosition(id) {
+    async deleteUser(id) {
       if (!confirm("Вы уверены, что хотите удалить?")) return;
       try {
-        await positionAPI.deletePosition(id);
-        await this.getPositions();
+        await userAPI.deleteUser(id);
+        await this.getUsers();
       } catch (error) {
         console.error("Ошибка при удалении:", error);
       }
     },
-    async updatePosition(positionData) {
+    async updateUser(userData) {
       try {
-        await positionAPI.updatePosition(
-          this.selectedPosition.id,
-          positionData,
+        await userAPI.updateUser(
+            this.selectedUser.id,
+            userData,
         );
         this.handleUpdate();
       } catch (error) {
         console.error(
-          "Ошибка:",
-          error.response ? error.response.data : error.message,
+            "Ошибка:",
+            error.response ? error.response.data : error.message,
         );
         const rawErrors = error.response?.data?.errors || [];
 
@@ -70,8 +72,16 @@ export default {
         }, {});
       }
     },
+    async limitUserAccess(id) {
+      try {
+        await userAPI.limitUser(id);
+        alert("Права доступа пользователя изменены.")
+      } catch (error) {
+        console.error("Ошибка при загрузке данных:", error);
+      }
+    },
     handleUpdate() {
-      this.getPositions();
+      this.getUsers();
       this.isFormVisible = false;
       this.errors = {};
     },
@@ -81,40 +91,41 @@ export default {
     },
     showCreateForm() {
       this.isEditing = false;
-      this.selectedPosition = null;
+      this.selectedUser = null;
       this.errors = {};
       this.isFormVisible = true;
     },
-    showEditForm(position) {
+    showEditForm(user) {
       this.isEditing = true;
-      this.selectedPosition = position;
+      this.selectedUser = user;
       this.errors = {};
       this.isFormVisible = true;
     },
   },
   mounted() {
-    this.getPositions();
+    this.getUsers();
   },
 };
 </script>
 
 <template>
   <div class="content">
-    <h2>Должности</h2>
+    <h2>Пользователи</h2>
     <CreateButton :buttonName="buttonName" @create="showCreateForm" />
-    <PositionsTable
-      :positions="positions"
-      @edit="showEditForm"
-      @delete="deletePosition"
+    <UsersTable
+        :users="users"
+        @edit="showEditForm"
+        @delete="deleteUser"
+        @limit="limitUserAccess"
     />
-    <PositionForm
-      v-if="isFormVisible"
-      :position="selectedPosition"
-      :isEditing="isEditing"
-      :errors="errors"
-      @update="updatePosition"
-      @create="createPosition"
-      @cancel="handleCancel"
+    <UserForm
+        v-if="isFormVisible"
+        :user="selectedUser"
+        :isEditing="isEditing"
+        :errors="errors"
+        @update="updateUser"
+        @create="createUser"
+        @cancel="handleCancel"
     />
   </div>
 </template>

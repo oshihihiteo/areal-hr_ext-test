@@ -10,9 +10,7 @@ export default {
 </script>
 
 <template>
-  <button @click="showCreateForm"> Добавить {{ buttonName }}</button>
+  <button @click="showCreateForm">Добавить {{ buttonName }}</button>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

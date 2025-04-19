@@ -3,15 +3,17 @@ export default {
   props: ["organization", "isEditing", "errors"],
   data() {
     return {
-      organizationData: { name: "" , comment: null},
+      organizationData: { name: "", comment: null },
     };
   },
   watch: {
     organization: {
       immediate: true,
       handler(newOrganization) {
-        this.organizationData = { name: newOrganization?.name || "",
-          comment: newOrganization?.comment || null};
+        this.organizationData = {
+          name: newOrganization?.name || "",
+          comment: newOrganization?.comment || null,
+        };
       },
     },
   },
@@ -19,9 +21,9 @@ export default {
     async submitForm() {
       const data = {
         name: this.organizationData.name.trim(),
-        comment: this.organizationData.comment?.trim() || null
+        comment: this.organizationData.comment?.trim() || null,
       };
-        if (this.isEditing) {
+      if (this.isEditing) {
         this.$emit("update", data);
       } else {
         this.$emit("create", data);
@@ -34,15 +36,26 @@ export default {
 };
 </script>
 
-
 <template>
   <div class="form-container">
-    <h3>{{ isEditing ? "Редактировать организацию" : "Создать организацию" }}</h3>
-    <input type="text" v-model="organizationData.name" placeholder="Название организации"/>
+    <h3>
+      {{ isEditing ? "Редактировать организацию" : "Создать организацию" }}
+    </h3>
+    <input
+      type="text"
+      v-model="organizationData.name"
+      placeholder="Название организации"
+    />
     <p v-if="errors?.name" class="error">{{ errors.name }}</p>
-    <input type="text" v-model="organizationData.comment" placeholder="Комментарий"/>
+    <input
+      type="text"
+      v-model="organizationData.comment"
+      placeholder="Комментарий"
+    />
     <p v-if="errors?.comment" class="error">{{ errors.comment }}</p>
-    <button @click="submitForm">{{ isEditing ? "Сохранить" : "Добавить" }}</button>
+    <button @click="submitForm">
+      {{ isEditing ? "Сохранить" : "Добавить" }}
+    </button>
     <button @click="cancelForm">Отмена</button>
   </div>
 </template>
@@ -52,6 +65,7 @@ export default {
   padding: 10px;
   border: 1px solid #ddd;
 }
+
 .error {
   color: red;
   font-size: 0.9em;

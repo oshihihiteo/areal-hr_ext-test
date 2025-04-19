@@ -1,12 +1,12 @@
 <script>
-import * as departmentAPI from '../instances/departments.js';
-import * as dropdownListAPI from '../instances/dropdown-list-options.js'
+import * as departmentAPI from "../instances/departments.js";
+import * as dropdownListAPI from "../instances/dropdown-list-options.js";
 import DepartmentsTable from "@/components/DepartmentsTable.vue";
 import DepartmentForm from "@/components/DepartmentForm.vue";
 import CreateButton from "@/components/CreateButton.vue";
 
 export default {
-  components: {DepartmentsTable, DepartmentForm, CreateButton},
+  components: { DepartmentsTable, DepartmentForm, CreateButton },
   data() {
     return {
       departments: [],
@@ -15,7 +15,7 @@ export default {
       isEditing: false,
       selectedDepartment: null,
       errors: {},
-      buttonName: "отдел"
+      buttonName: "отдел",
     };
   },
   methods: {
@@ -47,7 +47,10 @@ export default {
         await departmentAPI.createDepartment(departmentData);
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -57,10 +60,16 @@ export default {
     },
     async updateDepartment(departmentData) {
       try {
-        await departmentAPI.updateDepartment(this.selectedDepartment.id, departmentData)
+        await departmentAPI.updateDepartment(
+          this.selectedDepartment.id,
+          departmentData,
+        );
         this.handleUpdate();
       } catch (error) {
-        console.error("Ошибка:", error.response ? error.response.data : error.message);
+        console.error(
+          "Ошибка:",
+          error.response ? error.response.data : error.message,
+        );
         const rawErrors = error.response?.data?.errors || [];
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
@@ -72,27 +81,27 @@ export default {
       this.isEditing = false;
       this.selectedDepartment = null;
       this.isFormVisible = true;
-      this.errors={};
+      this.errors = {};
     },
     showEditForm(department) {
       this.isEditing = true;
       this.selectedDepartment = department;
       this.isFormVisible = true;
-      this.errors={};
+      this.errors = {};
     },
     handleUpdate() {
       this.getDepartments();
       this.isFormVisible = false;
-      this.errors={};
+      this.errors = {};
     },
     handleCancel() {
       this.isFormVisible = false;
-      this.errors={};
+      this.errors = {};
     },
   },
   mounted() {
     this.getOrganizations();
-    this.getDepartments()
+    this.getDepartments();
   },
 };
 </script>
@@ -100,32 +109,27 @@ export default {
 <template>
   <div class="content">
     <h2>Отделы</h2>
-    <CreateButton
-        :buttonName = buttonName
-        @create="showCreateForm"
-    />
+    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
 
     <DepartmentsTable
-        :departments="departments"
-        :organizations="organizations"
-        @edit="showEditForm"
-        @delete="deleteDepartment"
+      :departments="departments"
+      :organizations="organizations"
+      @edit="showEditForm"
+      @delete="deleteDepartment"
     />
 
     <DepartmentForm
-        v-if="isFormVisible"
-        :department="selectedDepartment"
-        :departments="departments"
-        :organizations="organizations"
-        :isEditing="isEditing"
-        :errors="errors"
-        @update="updateDepartment"
-        @create="createDepartment"
-        @cancel="handleCancel"
+      v-if="isFormVisible"
+      :department="selectedDepartment"
+      :departments="departments"
+      :organizations="organizations"
+      :isEditing="isEditing"
+      :errors="errors"
+      @update="updateDepartment"
+      @create="createDepartment"
+      @cancel="handleCancel"
     />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
