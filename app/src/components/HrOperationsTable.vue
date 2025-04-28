@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["hrOperations"],
+  props: ["isAdminOrManager", "hrOperations"],
   methods: {
     editHrOperation(hrOperation) {
       this.$emit("edit", hrOperation);
@@ -39,10 +39,18 @@ export default {
         <td>{{ hrOperation.position_name }}</td>
         <td>{{ hrOperation.salary }}</td>
         <td>
-          <button class="edit-btn" @click="editHrOperation(hrOperation)">
+          <button
+            v-if="isAdminOrManager"
+            class="edit-btn"
+            @click="editHrOperation(hrOperation)"
+          >
             Редактировать
           </button>
-          <button class="delete-btn" @click="deleteHrOperation(hrOperation.id)">
+          <button
+            v-if="isAdminOrManager"
+            class="delete-btn"
+            @click="deleteHrOperation(hrOperation.id)"
+          >
             Удалить
           </button>
         </td>

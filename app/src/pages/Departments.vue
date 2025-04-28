@@ -4,9 +4,11 @@ import * as dropdownListAPI from "../instances/dropdown-list-options.js";
 import DepartmentsTable from "@/components/DepartmentsTable.vue";
 import DepartmentForm from "@/components/DepartmentForm.vue";
 import CreateButton from "@/components/CreateButton.vue";
+import { useUserStore } from "@/stores/userStore.js";
+import UsersTable from "@/components/UsersTable.vue";
 
 export default {
-  components: { DepartmentsTable, DepartmentForm, CreateButton },
+  components: { UsersTable, DepartmentsTable, DepartmentForm, CreateButton },
   data() {
     return {
       departments: [],
@@ -16,6 +18,13 @@ export default {
       selectedDepartment: null,
       errors: {},
       buttonName: "отдел",
+    };
+  },
+  setup() {
+    const userStore = useUserStore();
+
+    return {
+      isAdminOrManager: userStore.isAdminOrManager,
     };
   },
   methods: {
@@ -109,13 +118,18 @@ export default {
 <template>
   <div class="content">
     <h2>Отделы</h2>
-    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
+    <CreateButton
+      v-if="isAdminOrManager"
+      :buttonName="buttonName"
+      @create="showCreateForm"
+    />
 
     <DepartmentsTable
       :departments="departments"
       :organizations="organizations"
       @edit="showEditForm"
       @delete="deleteDepartment"
+      :isAdminOrManager="isAdminOrManager"
     />
 
     <DepartmentForm

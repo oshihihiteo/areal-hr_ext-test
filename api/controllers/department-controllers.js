@@ -39,7 +39,7 @@ exports.createDepartment = async (req, res) => {
       object_id: departmentId,
       changed_fields: department,
     };
-    await Changelog.createChangelog(changelog);
+    await Changelog.createChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -63,7 +63,7 @@ exports.deleteDepartment = async (req, res) => {
       object_id: id,
       changed_fields: null,
     };
-    await Changelog.deleteChangelog(changelog);
+    await Changelog.deleteChangelog(req.user.id, changelog);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Ошибка при удалении отдела: ", error });
@@ -85,7 +85,7 @@ exports.editDepartment = async (req, res) => {
       object_id: id,
       changed_fields: department,
     };
-    await Changelog.editChangelog(changelog);
+    await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({

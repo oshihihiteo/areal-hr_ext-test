@@ -1,8 +1,8 @@
 <script>
-import {limitUser} from "@/instances/users.js";
+import { limitUser } from "@/instances/users.js";
 
 export default {
-  props: ["users"],
+  props: ["isAdmin", "isAdminOrManager", "users"],
   methods: {
     editUser(user) {
       this.$emit("edit", user);
@@ -20,20 +20,22 @@ export default {
 <template>
   <table>
     <thead>
-    <tr>
-      <th>ФИО</th>
-      <th>Действия</th>
-    </tr>
+      <tr>
+        <th>ФИО</th>
+        <th>Действия</th>
+      </tr>
     </thead>
     <tbody>
-    <tr v-for="user in users" :key="user.id">
-      <td>{{ user.lastname }} {{user.firstname}} {{user.patronymic}}</td>
-      <td>
-        <button @click="editUser(user)">Редактировать</button>
-        <button @click="deleteUser(user.id)">Удалить</button>
-        <button @click="limitUser(user.id)">Ограничить доступ</button>
-      </td>
-    </tr>
+      <tr v-for="user in users" :key="user.id">
+        <td>{{ user.lastname }} {{ user.firstname }} {{ user.patronymic }}</td>
+        <td>
+          <button v-if="isAdmin" @click="editUser(user)">Редактировать</button>
+          <button v-if="isAdmin" @click="deleteUser(user.id)">Удалить</button>
+          <button v-if="isAdmin" @click="limitUser(user.id)">
+            Ограничить доступ
+          </button>
+        </td>
+      </tr>
     </tbody>
   </table>
 </template>

@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["files"],
+  props: ["isAdminOrManager", "files"],
   methods: {
     editFile(file) {
       this.$emit("edit", file);
@@ -33,8 +33,12 @@ export default {
           <button @click="openFile(file)">Открыть файл</button>
         </td>
         <td>
-          <button @click="editFile(file)">Редактировать</button>
-          <button @click="deleteFile(file.id)">Удалить</button>
+          <button v-if="isAdminOrManager" @click="editFile(file)">
+            Редактировать
+          </button>
+          <button v-if="isAdminOrManager" @click="deleteFile(file.id)">
+            Удалить
+          </button>
         </td>
       </tr>
     </tbody>

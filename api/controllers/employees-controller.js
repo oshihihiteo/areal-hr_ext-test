@@ -64,7 +64,7 @@ exports.createEmployee = async (req, res) => {
       passport_data_id: passportDataId,
       address_id: addressId,
     };
-    const employeeId = await Employees.create(employeeData);
+    const employeeId = await Employees.create(req.user.id, employeeData);
     res.status(200).json({ message: "Сотрудник добавлен." });
 
     const changelog = {
@@ -101,7 +101,7 @@ exports.deleteEmployee = async (req, res) => {
       object_id: id,
       changed_fields: null,
     };
-    await Changelog.deleteChangelog(changelog);
+    await Changelog.deleteChangelog(req.user.id, changelog);
   } catch (error) {
     console.error(error);
     res
@@ -152,7 +152,7 @@ exports.editEmployee = async (req, res) => {
       object_id: id,
       changed_fields: data,
     };
-    await Changelog.editChangelog(changelog);
+    await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({

@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["organizations"],
+  props: ["isAdminOrManager", "organizations"],
   methods: {
     editOrganization(organization) {
       this.$emit("edit", organization);
@@ -26,10 +26,15 @@ export default {
         <td>{{ organization.name }}</td>
         <td>{{ organization.comment }}</td>
         <td>
-          <button class="edit-btn" @click="editOrganization(organization)">
+          <button
+            v-if="isAdminOrManager"
+            class="edit-btn"
+            @click="editOrganization(organization)"
+          >
             Редактировать
           </button>
           <button
+            v-if="isAdminOrManager"
             class="delete-btn"
             @click="deleteOrganization(organization.id)"
           >

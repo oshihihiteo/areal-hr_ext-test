@@ -3,6 +3,7 @@ import * as organizationAPI from "../instances/organizations.js";
 import OrganizationForm from "../components/OrganizationForm.vue";
 import OrganizationsTable from "../components/OrganizationsTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
+import { useUserStore } from "@/stores/userStore.js";
 
 export default {
   components: { OrganizationForm, OrganizationsTable, CreateButton },
@@ -14,6 +15,13 @@ export default {
       selectedOrganization: null,
       errors: {},
       buttonName: "организацию",
+    };
+  },
+  setup() {
+    const userStore = useUserStore();
+
+    return {
+      isAdminOrManager: userStore.isAdminOrManager,
     };
   },
   methods: {
@@ -102,12 +110,17 @@ export default {
 <template>
   <div class="content">
     <h2>Организации</h2>
-    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
+    <CreateButton
+      v-if="isAdminOrManager"
+      :buttonName="buttonName"
+      @create="showCreateForm"
+    />
 
     <OrganizationsTable
       :organizations="organizations"
       @edit="showEditForm"
       @delete="deleteOrganization"
+      :isAdminOrManager="isAdminOrManager"
     />
 
     <OrganizationForm

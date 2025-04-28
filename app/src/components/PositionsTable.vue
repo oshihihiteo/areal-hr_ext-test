@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["positions"],
+  props: ["isAdminOrManager", "positions"],
   methods: {
     editPosition(position) {
       this.$emit("edit", position);
@@ -24,8 +24,12 @@ export default {
       <tr v-for="position in positions" :key="position.id">
         <td>{{ position.name }}</td>
         <td>
-          <button @click="editPosition(position)">Редактировать</button>
-          <button @click="deletePosition(position.id)">Удалить</button>
+          <button v-if="isAdminOrManager" @click="editPosition(position)">
+            Редактировать
+          </button>
+          <button v-if="isAdminOrManager" @click="deletePosition(position.id)">
+            Удалить
+          </button>
         </td>
       </tr>
     </tbody>

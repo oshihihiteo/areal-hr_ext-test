@@ -2,9 +2,16 @@ const express = require("express");
 const router = express.Router();
 const HrOperationsController = require("../controllers/hr-operations-controller");
 
-router.get("/hr-operations", HrOperationsController.getAllHrOperations);
-router.post("/hr-operations", HrOperationsController.createHrOperation);
-router.delete("/hr-operations/:id", HrOperationsController.deleteHrOperation);
-router.put("/hr-operations/:id", HrOperationsController.editHrOperation);
+router.use((req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Авторизуйтесь для доступа" });
+    }
+    next();
+});
+
+router.get("/", HrOperationsController.getAllHrOperations);
+router.post("/", HrOperationsController.createHrOperation);
+router.delete("/:id", HrOperationsController.deleteHrOperation);
+router.put("/:id", HrOperationsController.editHrOperation);
 
 module.exports = router;

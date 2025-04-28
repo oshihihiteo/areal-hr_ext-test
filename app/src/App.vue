@@ -1,11 +1,12 @@
 <template>
   <div class="app-container">
-    <NavigationBar></NavigationBar>
+    <NavigationBar v-if="showNavbar" />
     <div class="content">
       <router-view />
     </div>
   </div>
 </template>
+
 
 <style>
 nav {
@@ -30,10 +31,23 @@ nav a {
 </style>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, computed } from "vue";
+import { useRoute } from "vue-router";
 import NavigationBar from "@/components/NavigationBar.vue";
 
 export default defineComponent({
   components: { NavigationBar },
+  setup() {
+    const route = useRoute();
+
+    const showNavbar = computed(() => {
+      return route.path !== '/login';
+    });
+
+    return {
+      showNavbar,
+    };
+  }
 });
 </script>
+

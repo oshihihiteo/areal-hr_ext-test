@@ -42,7 +42,7 @@ exports.createPosition = async (req, res) => {
       object_id: positionId,
       changed_fields: position,
     };
-    await Changelog.createChangelog(changelog);
+    await Changelog.createChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -70,7 +70,7 @@ exports.deletePosition = async (req, res) => {
       object_id: id,
       changed_fields: null,
     };
-    await Changelog.deleteChangelog(changelog);
+    await Changelog.deleteChangelog(req.user.id, changelog);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Ошибка при удалении должности: ", error });
@@ -93,7 +93,7 @@ exports.editPosition = async (req, res) => {
       object_id: id,
       changed_fields: position,
     };
-    await Changelog.editChangelog(changelog);
+    await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({

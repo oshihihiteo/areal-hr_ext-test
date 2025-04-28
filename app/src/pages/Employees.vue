@@ -3,6 +3,7 @@ import * as employeesAPI from "../instances/employees.js";
 import CreateButton from "@/components/CreateButton.vue";
 import EmployeesTable from "@/components/EmployeesTable.vue";
 import EmployeeForm from "@/components/EmployeeForm.vue";
+import {useUserStore} from "@/stores/userStore.js";
 
 export default {
   components: { EmployeeForm, EmployeesTable, CreateButton },
@@ -14,6 +15,13 @@ export default {
       errors: {},
       selectedEmployee: null,
       buttonName: "сотрудника",
+    };
+  },
+  setup() {
+    const userStore = useUserStore();
+
+    return {
+      isAdminOrManager: userStore.isAdminOrManager,
     };
   },
   methods: {
@@ -99,12 +107,13 @@ export default {
 <template>
   <div class="content">
     <h2>Сотрудники</h2>
-    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
+    <CreateButton v-if="isAdminOrManager" :buttonName="buttonName" @create="showCreateForm" />
 
     <EmployeesTable
       :employees="employees"
       @edit="showEditForm"
       @delete="deleteEmployee"
+      :isAdminOrManager="isAdminOrManager"
     />
 
     <EmployeeForm

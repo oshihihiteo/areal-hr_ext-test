@@ -14,25 +14,25 @@ exports.getChangelog = async (req, res) => {
   }
 };
 
-exports.createChangelog = async (changelogData) => {
+exports.createChangelog = async (userId, changelogData) => {
   try {
-    const changelog = await Changelog.createLog(null, changelogData);
+    const changelog = await Changelog.createLog(userId, changelogData);
   } catch (error) {
     console.error(error);
   }
 };
 
-exports.editChangelog = async (changelogData) => {
+exports.editChangelog = async (userId, changelogData) => {
   try {
-    const changelog = await Changelog.editLog(null, changelogData);
+    const changelog = await Changelog.editLog(userId, changelogData);
   } catch (error) {
     console.error(error);
   }
 };
 
-exports.deleteChangelog = async (changelogData) => {
+exports.deleteChangelog = async (userId, changelogData) => {
   try {
-    const changelog = await Changelog.deleteLog(null, changelogData);
+    const changelog = await Changelog.deleteLog(userId, changelogData);
   } catch (error) {
     console.error(error);
   }

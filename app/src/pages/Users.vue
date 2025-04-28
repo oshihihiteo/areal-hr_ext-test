@@ -3,10 +3,18 @@ import * as userAPI from "../instances/users.js";
 import UserForm from "../components/UserForm.vue";
 import UsersTable from "../components/UsersTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
-import {limitUser} from "../instances/users.js";
+import { useUserStore } from "@/stores/userStore.js";
 
 export default {
   components: { UserForm, UsersTable, CreateButton },
+  setup() {
+    const userStore = useUserStore();
+
+    return {
+      isAdmin: userStore.isAdmin,
+      isAdminOrManager: userStore.isAdminOrManager,
+    };
+  },
   data() {
     return {
       users: [],
@@ -18,7 +26,6 @@ export default {
     };
   },
   methods: {
-    limitUser,
     async getUsers() {
       try {
         this.users = await userAPI.getUsers();
@@ -36,7 +43,6 @@ export default {
             error.response ? error.response.data : error.message,
         );
         const rawErrors = error.response?.data?.errors || [];
-
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
           return acc;
@@ -54,10 +60,7 @@ export default {
     },
     async updateUser(userData) {
       try {
-        await userAPI.updateUser(
-            this.selectedUser.id,
-            userData,
-        );
+        await userAPI.updateUser(this.selectedUser.id, userData);
         this.handleUpdate();
       } catch (error) {
         console.error(
@@ -65,7 +68,6 @@ export default {
             error.response ? error.response.data : error.message,
         );
         const rawErrors = error.response?.data?.errors || [];
-
         this.errors = rawErrors.reduce((acc, err) => {
           acc[err.field] = err.message;
           return acc;
@@ -75,7 +77,7 @@ export default {
     async limitUserAccess(id) {
       try {
         await userAPI.limitUser(id);
-        alert("Права доступа пользователя изменены.")
+        alert("Права доступа пользователя изменены.");
       } catch (error) {
         console.error("Ошибка при загрузке данных:", error);
       }
@@ -104,28 +106,37 @@ export default {
   },
   mounted() {
     this.getUsers();
+    console.log(this.isAdminOrManager);
+    console.log(this.isAdmin)
   },
 };
 </script>
 
+
 <template>
   <div class="content">
     <h2>Пользователи</h2>
-    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
+    <CreateButton
+      v-if="isAdmin"
+      :buttonName="buttonName"
+      @create="showCreateForm"
+    />
     <UsersTable
-        :users="users"
-        @edit="showEditForm"
-        @delete="deleteUser"
-        @limit="limitUserAccess"
+      :users="users"
+      @edit="showEditForm"
+      @delete="deleteUser"
+      @limit="limitUserAccess"
+      :isAdminOrManager="isAdminOrManager"
+      :isAdmin="isAdmin"
     />
     <UserForm
-        v-if="isFormVisible"
-        :user="selectedUser"
-        :isEditing="isEditing"
-        :errors="errors"
-        @update="updateUser"
-        @create="createUser"
-        @cancel="handleCancel"
+      v-if="isFormVisible"
+      :user="selectedUser"
+      :isEditing="isEditing"
+      :errors="errors"
+      @update="updateUser"
+      @create="createUser"
+      @cancel="handleCancel"
     />
   </div>
 </template>

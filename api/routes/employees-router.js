@@ -2,10 +2,17 @@ const express = require("express");
 const router = express.Router();
 const EmployeesController = require("../controllers/employees-controller");
 
-router.get("/employees", EmployeesController.getAllEmployees);
-router.get("/employees/:id", EmployeesController.getEmployeeById);
-router.post("/employees", EmployeesController.createEmployee);
-router.delete("/employees/:id", EmployeesController.deleteEmployee);
-router.put("/employees/:id", EmployeesController.editEmployee);
+router.use((req, res, next) => {
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Авторизуйтесь для доступа" });
+    }
+    next();
+});
+
+router.get("/", EmployeesController.getAllEmployees);
+router.get("/:id", EmployeesController.getEmployeeById);
+router.post("/", EmployeesController.createEmployee);
+router.delete("/:id", EmployeesController.deleteEmployee);
+router.put("/:id", EmployeesController.editEmployee);
 
 module.exports = router;

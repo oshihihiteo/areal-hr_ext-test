@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["departments", "organizations"],
+  props: ["isAdminOrManager", "departments", "organizations"],
   methods: {
     editDepartment(department) {
       this.$emit("edit", department);
@@ -39,10 +39,10 @@ export default {
         <td>{{ getDepartmentName(department.parent_id) }}</td>
         <td>{{ department.comment }}</td>
         <td>
-          <button class="edit-btn" @click="editDepartment(department)">
+          <button v-if="isAdminOrManager" class="edit-btn" @click="editDepartment(department)">
             Редактировать
           </button>
-          <button class="delete-btn" @click="deleteDepartment(department.id)">
+          <button v-if="isAdminOrManager" class="delete-btn" @click="deleteDepartment(department.id)">
             Удалить
           </button>
         </td>

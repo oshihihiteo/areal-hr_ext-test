@@ -45,7 +45,7 @@ exports.createOrganization = async (req, res) => {
       object_id: organizationId,
       changed_fields: req.body.organizationData,
     };
-    await Changelog.createChangelog(changelog);
+    await Changelog.createChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -71,7 +71,7 @@ exports.deleteOrganization = async (req, res) => {
       object_id: id,
       changed_fields: null,
     };
-    await Changelog.deleteChangelog(changelog);
+    await Changelog.deleteChangelog(req.user.id, changelog);
   } catch (error) {
     console.error(error);
     res
@@ -96,7 +96,7 @@ exports.editOrganization = async (req, res) => {
       object_id: id,
       changed_fields: req.body.organizationData,
     };
-    await Changelog.createChangelog(changelog);
+    await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({

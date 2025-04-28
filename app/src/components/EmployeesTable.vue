@@ -1,6 +1,6 @@
 <script>
 export default {
-  props: ["employees"],
+  props: ["isAdminOrManager", "employees"],
   methods: {
     editEmployee(employee) {
       this.$emit("edit", employee);
@@ -50,8 +50,8 @@ export default {
           >
         </td>
         <td>
-          <button @click="editEmployee(employee)">Редактировать</button>
-          <button @click="deleteEmployee(employee.id)">Удалить</button>
+          <button v-if="isAdminOrManager" @click="editEmployee(employee)">Редактировать</button>
+          <button v-if="isAdminOrManager" @click="deleteEmployee(employee.id)">Удалить</button>
         </td>
       </tr>
     </tbody>

@@ -4,6 +4,7 @@ import * as dropdownListAPI from "../instances/dropdown-list-options.js";
 import HrOperationForm from "../components/HrOperationForm.vue";
 import HrOperationsTable from "../components/HrOperationsTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
+import { useUserStore } from "@/stores/userStore.js";
 
 export default {
   components: { HrOperationsTable, HrOperationForm, CreateButton },
@@ -19,6 +20,13 @@ export default {
       selectedHrOperation: null,
       errors: {},
       buttonName: "кадровую операцию",
+    };
+  },
+  setup() {
+    const userStore = useUserStore();
+
+    return {
+      isAdminOrManager: userStore.isAdminOrManager,
     };
   },
   methods: {
@@ -138,11 +146,16 @@ export default {
 <template>
   <div class="content">
     <h2>Кадровые операции</h2>
-    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
+    <CreateButton
+      v-if="isAdminOrManager"
+      :buttonName="buttonName"
+      @create="showCreateForm"
+    />
     <HrOperationsTable
       :hrOperations="hrOperations"
       @edit="showEditForm"
       @delete="deleteHrOperation"
+      :isAdminOrManager="isAdminOrManager"
     />
 
     <HrOperationForm

@@ -18,7 +18,7 @@ class UsersModel {
   static async create(data) {
     const result = await client.query(
       `INSERT INTO users (role_id, lastname, firstname, patronymic, login, password)
-             VALUES (1, $1, $2, $3, $4, $5)
+             VALUES (2, $1, $2, $3, $4, $5)
              RETURNING id`,
       [
         data.lastname,

@@ -126,7 +126,7 @@ exports.limitUserAccess = async (req, res) => {
       object_id: id,
       changed_fields: "Доступ ограничен",
     };
-    await Changelog.editChangelog(changelog);
+    await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -141,3 +141,6 @@ exports.limitUserAccess = async (req, res) => {
     });
   }
 };
+
+
+

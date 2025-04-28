@@ -5,6 +5,7 @@ import FilesTable from "@/components/FilesTable.vue";
 import FileForm from "@/components/FileForm.vue";
 import axiosInstance from "@/instances/baseURL.js";
 import * as dropdownListAPI from "../instances/dropdown-list-options.js";
+import { useUserStore } from "@/stores/userStore.js";
 
 export default {
   components: { FileForm, FilesTable, CreateButton },
@@ -17,6 +18,13 @@ export default {
       selectedFile: null,
       errors: {},
       buttonName: "файл",
+    };
+  },
+  setup() {
+    const userStore = useUserStore();
+
+    return {
+      isAdminOrManager: userStore.isAdminOrManager,
     };
   },
   methods: {
@@ -113,12 +121,17 @@ export default {
 <template>
   <div class="content">
     <h2>Файлы</h2>
-    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
+    <CreateButton
+      v-if="isAdminOrManager"
+      :buttonName="buttonName"
+      @create="showCreateForm"
+    />
     <FilesTable
       :files="files"
       @edit="showEditForm"
       @delete="deleteFile"
       @open="openFile"
+      :isAdminOrManager="isAdminOrManager"
     />
 
     <FileForm

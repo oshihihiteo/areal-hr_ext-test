@@ -3,6 +3,7 @@ import * as positionAPI from "../instances/positions.js";
 import PositionForm from "../components/PositionForm.vue";
 import PositionsTable from "../components/PositionsTable.vue";
 import CreateButton from "@/components/CreateButton.vue";
+import {useUserStore} from "@/stores/userStore.js";
 
 export default {
   components: { PositionForm, PositionsTable, CreateButton },
@@ -14,6 +15,13 @@ export default {
       selectedPosition: null,
       errors: {},
       buttonName: "должность",
+    };
+  },
+  setup() {
+    const userStore = useUserStore();
+
+    return {
+      isAdminOrManager: userStore.isAdminOrManager,
     };
   },
   methods: {
@@ -101,11 +109,12 @@ export default {
 <template>
   <div class="content">
     <h2>Должности</h2>
-    <CreateButton :buttonName="buttonName" @create="showCreateForm" />
+    <CreateButton v-if="isAdminOrManager" :buttonName="buttonName" @create="showCreateForm" />
     <PositionsTable
       :positions="positions"
       @edit="showEditForm"
       @delete="deletePosition"
+      :isAdminOrManager="isAdminOrManager"
     />
     <PositionForm
       v-if="isFormVisible"

@@ -1,6 +1,8 @@
 const FilesModel = require("../models/files-model");
 const Changelog = require("./changelog-controller");
 const fileSchema = require("../validationSchemas/files-schema");
+const path = require("path");
+const formatJoiErrors = require("../config/validation/joi-validation");
 
 exports.getAllFiles = async (req, res) => {
   try {
@@ -37,9 +39,6 @@ exports.getFileById = async (req, res) => {
   }
 };
 
-const path = require("path");
-const formatJoiErrors = require("../config/validation/joi-validation");
-
 exports.getRawFileById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -75,7 +74,7 @@ exports.createFile = async (req, res) => {
       object_id: fileId,
       changed_fields: file,
     };
-    await Changelog.createChangelog(changelog);
+    await Changelog.createChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -107,7 +106,7 @@ exports.editFile = async (req, res) => {
       object_id: id,
       changed_fields: file,
     };
-    await Changelog.editChangelog(changelog);
+    await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -132,7 +131,7 @@ exports.deleteFile = async (req, res) => {
       object_id: id,
       changed_fields: null,
     };
-    await Changelog.deleteChangelog(changelog);
+    await Changelog.deleteChangelog(req.user.id, changelog);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Ошибка при удалении файла", error });

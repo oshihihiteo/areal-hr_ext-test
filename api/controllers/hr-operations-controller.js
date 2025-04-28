@@ -32,7 +32,7 @@ exports.createHrOperation = async (req, res) => {
       object_id: hrOperationId,
       changed_fields: hrOperation,
     };
-    await Changelog.createChangelog(changelog);
+    await Changelog.createChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -59,7 +59,7 @@ exports.deleteHrOperation = async (req, res) => {
       object_id: id,
       changed_fields: null,
     };
-    await Changelog.deleteChangelog(changelog);
+    await Changelog.deleteChangelog(req.user.id, changelog);
   } catch (error) {
     console.error(error);
     res
@@ -84,7 +84,7 @@ exports.editHrOperation = async (req, res) => {
       object_id: id,
       changed_fields: hrOperation,
     };
-    await Changelog.editChangelog(changelog);
+    await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
