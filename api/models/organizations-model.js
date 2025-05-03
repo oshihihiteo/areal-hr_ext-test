@@ -15,22 +15,49 @@ class OrganizationsModel {
   }
 
   static async create(organizationData) {
-    const result = await client.query(
-      "INSERT INTO organizations VALUES (DEFAULT, $1, $2) RETURNING id",
-      [organizationData.name, organizationData.comment],
-    );
-    return result.rows[0].id;
+    try {
+      await client.query("BEGIN");
+
+      const result = await client.query(
+        "INSERT INTO organizations VALUES (DEFAULT, $1, $2) RETURNING id",
+        [organizationData.name, organizationData.comment],
+      );
+
+      await client.query("COMMIT");
+      return result.rows[0].id;
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 
   static async delete(id) {
-    await client.query("DELETE FROM organizations WHERE id = $1", [id]);
+    try {
+      await client.query("BEGIN");
+
+      await client.query("DELETE FROM organizations WHERE id = $1", [id]);
+
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 
   static async edit(id, organizationData) {
-    await client.query(
-      "UPDATE organizations SET name = $2, comment = $3 WHERE id = $1",
-      [id, organizationData.name, organizationData.comment],
-    );
+    try {
+      await client.query("BEGIN");
+
+      await client.query(
+        "UPDATE organizations SET name = $2, comment = $3 WHERE id = $1",
+        [id, organizationData.name, organizationData.comment],
+      );
+
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 
   static async findByName(organizationName, id) {

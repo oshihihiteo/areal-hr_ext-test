@@ -41,43 +41,70 @@ class HrOperationsModel {
   }
 
   static async create(data) {
-    const result = await client.query(
-      `INSERT INTO hr_operations
-             VALUES (DEFAULT, $1, $2, $3, $4, $5, now())
-             RETURNING id`,
-      [
-        data.employee_id,
-        data.action_id,
-        data.salary,
-        data.position_id,
-        data.department_id,
-      ],
-    );
-    return result.rows[0].id;
+    try {
+      await client.query("BEGIN");
+
+      const result = await client.query(
+        `INSERT INTO hr_operations
+                 VALUES (DEFAULT, $1, $2, $3, $4, $5, now())
+                 RETURNING id`,
+        [
+          data.employee_id,
+          data.action_id,
+          data.salary,
+          data.position_id,
+          data.department_id,
+        ],
+      );
+
+      await client.query("COMMIT");
+      return result.rows[0].id;
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 
   static async edit(id, data) {
-    await client.query(
-      `UPDATE hr_operations
-             SET employee_id   = $2,
-                 action_id     = $3,
-                 salary        = $4,
-                 position_id = $5,
-                 department_id = $6
-             WHERE id = $1`,
-      [
-        id,
-        data.employee_id,
-        data.action_id,
-        data.salary,
-        data.position_id,
-        data.department_id,
-      ],
-    );
+    try {
+      await client.query("BEGIN");
+
+      await client.query(
+        `UPDATE hr_operations
+                 SET employee_id   = $2,
+                     action_id     = $3,
+                     salary        = $4,
+                     position_id   = $5,
+                     department_id = $6
+                 WHERE id = $1`,
+        [
+          id,
+          data.employee_id,
+          data.action_id,
+          data.salary,
+          data.position_id,
+          data.department_id,
+        ],
+      );
+
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 
   static async delete(id) {
-    await client.query("DELETE FROM hr_operations WHERE id = $1", [id]);
+    try {
+      await client.query("BEGIN");
+
+      await client.query("DELETE FROM hr_operations WHERE id = $1", [id]);
+
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 }
 

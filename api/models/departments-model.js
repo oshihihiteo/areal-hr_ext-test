@@ -15,38 +15,67 @@ class DepartmentsModel {
   }
 
   static async create(departmentData) {
-    const result = await client.query(
-      "INSERT INTO departments VALUES (DEFAULT, $1, $2, $3, $4) RETURNING id",
-      [
-        departmentData.name,
-        departmentData.organization_id,
-        departmentData.parent_id,
-        departmentData.comment,
-      ],
-    );
-    return result.rows[0].id;
+    try {
+      await client.query("BEGIN");
+
+      const result = await client.query(
+        `INSERT INTO departments
+                 VALUES (DEFAULT, $1, $2, $3, $4)
+                 RETURNING id`,
+        [
+          departmentData.name,
+          departmentData.organization_id,
+          departmentData.parent_id,
+          departmentData.comment,
+        ],
+      );
+
+      await client.query("COMMIT");
+      return result.rows[0].id;
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 
   static async delete(id) {
-    await client.query("DELETE FROM departments WHERE id = $1", [id]);
+    try {
+      await client.query("BEGIN");
+
+      await client.query("DELETE FROM departments WHERE id = $1", [id]);
+
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 
   static async edit(id, departmentData) {
-    await client.query(
-      `UPDATE departments
-             SET name = $2,
-                 organization_id = $3,
-                 parent_id       = $4,
-                 comment         = $5
-             WHERE id = $1`,
-      [
-        id,
-        departmentData.name,
-        departmentData.organization_id,
-        departmentData.parent_id,
-        departmentData.comment,
-      ],
-    );
+    try {
+      await client.query("BEGIN");
+
+      await client.query(
+        `UPDATE departments
+                 SET name            = $2,
+                     organization_id = $3,
+                     parent_id       = $4,
+                     comment         = $5
+                 WHERE id = $1`,
+        [
+          id,
+          departmentData.name,
+          departmentData.organization_id,
+          departmentData.parent_id,
+          departmentData.comment,
+        ],
+      );
+
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
   }
 }
 
