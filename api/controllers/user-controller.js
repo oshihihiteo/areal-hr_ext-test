@@ -2,7 +2,7 @@ const Users = require("../models/users-model");
 const Changelog = require("./changelog-controller");
 const userSchema = require("../validationSchemas/user-schema");
 const formatJoiErrors = require("../config/validation/joi-validation");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 exports.getAllUsers = async (req, res) => {
   try {

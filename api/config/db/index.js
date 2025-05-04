@@ -1,5 +1,6 @@
 require("dotenv").config({ path: "../.env" });
 const { Client } = require("pg");
+const Users = require("../../models/users-model");
 
 const client = new Client({
   host: process.env.DB_HOST,

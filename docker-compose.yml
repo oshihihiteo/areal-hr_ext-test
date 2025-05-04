@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: ./containers/api/Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+
+  app:
+    build:
+      context: .
+      dockerfile: ./containers/app/Dockerfile
+    ports:
+      - "${VITE_PORT}:${VITE_PORT}"
+    env_file:
+      - ./.env
+    depends_on:
+      - api
+
+volumes:
+  db_data:

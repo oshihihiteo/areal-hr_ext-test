@@ -8,6 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+console.log('!!!!!!!!PORT FROM ENV:', process.env.VITE_PORT);
 
 export default defineConfig({
   plugins: [
@@ -23,6 +24,8 @@ export default defineConfig({
     'import.meta.env.VITE_BASE_URL': JSON.stringify(process.env.VITE_BASE_URL),
   },
   server: {
-    port: process.env.VITE_PORT
+    port: parseInt(process.env.VITE_PORT, 10) || 3000,
+    host: true
   }
 })
+

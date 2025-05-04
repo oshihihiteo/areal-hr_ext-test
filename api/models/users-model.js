@@ -110,6 +110,31 @@ class UsersModel {
     const result = await client.query(query, params);
     return result.rows[0] || null;
   }
+
+  static async createAdmin(data) {
+    try {
+      await client.query("BEGIN");
+
+      const result = await client.query(
+          `INSERT INTO users (role_id, lastname, firstname, patronymic, login, password)
+                 VALUES (1, $1, $2, $3, $4, $5)
+                 RETURNING id`,
+          [
+            data.lastname,
+            data.firstname,
+            data.patronymic,
+            data.login,
+            data.password,
+          ],
+      );
+
+      await client.query("COMMIT");
+      return result.rows[0].id;
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    }
+  }
 }
 
 module.exports = UsersModel;
