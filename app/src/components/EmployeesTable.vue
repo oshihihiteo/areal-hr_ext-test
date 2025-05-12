@@ -1,5 +1,8 @@
 <script>
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: { BaseButton },
   props: ["isAdminOrManager", "employees"],
   methods: {
     editEmployee(employee) {
@@ -50,8 +53,20 @@ export default {
           >
         </td>
         <td>
-          <button v-if="isAdminOrManager" @click="editEmployee(employee)">Редактировать</button>
-          <button v-if="isAdminOrManager" @click="deleteEmployee(employee.id)">Удалить</button>
+          <BaseButton
+            v-if="isAdminOrManager"
+            @click="editEmployee(employee)"
+            size="sm"
+          >
+            Редактировать
+          </BaseButton>
+          <BaseButton
+            v-if="isAdminOrManager"
+            @click="deleteEmployee(employee.id)"
+            size="sm"
+          >
+            Удалить
+          </BaseButton>
         </td>
       </tr>
     </tbody>

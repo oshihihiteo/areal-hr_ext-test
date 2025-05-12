@@ -1,8 +1,8 @@
 require("dotenv").config({ path: "../.env" });
-const { Client } = require("pg");
-const Users = require("../../models/users-model");
 
-const client = new Client({
+const { Pool } = require("pg");
+
+const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
@@ -10,15 +10,15 @@ const client = new Client({
   password: process.env.DB_PASSWORD,
 });
 
-client
-  .connect()
-  .then(() => console.log("Подключение к базе данных успешно!"))
-  .catch((err) => console.error("Ошибка подключения к базе данных:", err));
+pool
+    .connect()
+    .then(() => console.log("Подключение к базе данных успешно!"))
+    .catch((err) => console.error("Ошибка подключения к базе данных:", err));
 
 process.on("SIGINT", async () => {
-  await client.end();
+  await pool.end();
   console.log("Соединение с базой данных закрыто");
   process.exit(0);
 });
 
-module.exports = client;
+module.exports = pool;

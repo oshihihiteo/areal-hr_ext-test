@@ -1,5 +1,8 @@
 <script>
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: { BaseButton },
   props: ["isAdminOrManager", "positions"],
   methods: {
     editPosition(position) {
@@ -24,12 +27,21 @@ export default {
       <tr v-for="position in positions" :key="position.id">
         <td>{{ position.name }}</td>
         <td>
-          <button v-if="isAdminOrManager" @click="editPosition(position)">
+          <BaseButton
+            v-if="isAdminOrManager"
+            @click="editPosition(position)"
+            size="sm"
+          >
             Редактировать
-          </button>
-          <button v-if="isAdminOrManager" @click="deletePosition(position.id)">
+          </BaseButton>
+          <BaseButton
+            v-if="isAdminOrManager"
+            @click="deletePosition(position.id)"
+            variant="danger"
+            size="sm"
+          >
             Удалить
-          </button>
+          </BaseButton>
         </td>
       </tr>
     </tbody>

@@ -1,5 +1,10 @@
 <script>
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseButton,
+  },
   props: ["isAdminOrManager", "departments", "organizations"],
   methods: {
     editDepartment(department) {
@@ -10,12 +15,12 @@ export default {
     },
     getOrganizationName(orgId) {
       const organization = this.organizations.find((org) => org.id === orgId);
-      return organization ? organization.name : "Неизвестно";
+      return organization ? organization.name : "-";
     },
     getDepartmentName(deptId) {
       if (!deptId) return "-";
       const department = this.departments.find((dept) => dept.id === deptId);
-      return department ? department.name : "Неизвестно";
+      return department ? department.name : "-";
     },
   },
 };
@@ -39,12 +44,22 @@ export default {
         <td>{{ getDepartmentName(department.parent_id) }}</td>
         <td>{{ department.comment }}</td>
         <td>
-          <button v-if="isAdminOrManager" class="edit-btn" @click="editDepartment(department)">
+          <BaseButton
+            v-if="isAdminOrManager"
+            class="edit-btn"
+            @click="editDepartment(department)"
+            size="sm"
+          >
             Редактировать
-          </button>
-          <button v-if="isAdminOrManager" class="delete-btn" @click="deleteDepartment(department.id)">
+          </BaseButton>
+          <BaseButton
+            v-if="isAdminOrManager"
+            class="delete-btn"
+            @click="deleteDepartment(department.id)"
+            size="sm"
+          >
             Удалить
-          </button>
+          </BaseButton>
         </td>
       </tr>
     </tbody>

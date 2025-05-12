@@ -5,12 +5,10 @@ exports.getChangelog = async (req, res) => {
     const changelog = await Changelog.getAll();
     res.status(200).json({ changelog });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Ошибка при получении истории изменений.",
-        error: error,
-      });
+    res.status(500).json({
+      message: "Ошибка при получении истории изменений.",
+      error: error,
+    });
   }
 };
 

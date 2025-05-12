@@ -2,38 +2,61 @@
   <div class="form-container">
     <h3>{{ isEditing ? "Редактировать файл" : "Загрузить файл" }}</h3>
     <form @submit.prevent="handleSubmit">
-      <input v-model="fileData.name" placeholder="Название" required />
-      <p v-if="errors?.name" class="error">{{ errors.name }}</p>
+      <BaseInput
+        v-model="fileData.name"
+        id="file-name"
+        label="Название"
+        :required="true"
+        :error="errors?.name"
+      />
 
-      <select v-model="fileData.employee_id" id="employee" required>
-        <option disabled value="">Выберите сотрудника</option>
-        <option
-          v-for="employee in employees"
-          :key="employee.id"
-          :value="employee.id"
-        >
-          {{ employee.lastname }} {{ employee.firstname }}
-          {{ employee.patronymic }}, отдел - {{ employee.department_name }},
-          должность - {{ employee.position_name }}
-        </option>
-      </select>
-      <p v-if="errors?.employee_id" class="error">{{ errors.employee_id }}</p>
+      <BaseSelect
+        v-model="fileData.employee_id"
+        id="employee"
+        label="Сотрудник:"
+        :options="employees"
+        :valueKey="'id'"
+        :labelKey="
+          (employee) =>
+            `${employee.lastname} ${employee.firstname} ${employee.patronymic}, отдел - ${employee.department_name}, должность - ${employee.position_name}`
+        "
+        placeholder="Выберите сотрудника"
+        :required="true"
+        :error="errors?.employee_id"
+      />
 
-      <input type="file" @change="handleFileChange" :required="!isEditing" />
-      <p v-if="errors?.file" class="error">{{ errors.file }}</p>
+      <div class="form-group">
+        <label for="file-upload">Файл</label>
+        <input
+          id="file-upload"
+          type="file"
+          @change="handleFileChange"
+          :required="!isEditing"
+        />
+        <p v-if="errors?.file" class="error">{{ errors.file }}</p>
+      </div>
 
       <div class="buttons">
-        <button type="submit">
+        <BaseButton type="submit">
           {{ isEditing ? "Сохранить" : "Загрузить" }}
-        </button>
-        <button type="button" @click="$emit('cancel')">Отмена</button>
+        </BaseButton>
+        <BaseButton type="button" @click="$emit('cancel')">Отмена</BaseButton>
       </div>
     </form>
   </div>
 </template>
 
 <script>
+import BaseInput from "@/components/BaseInput.vue";
+import BaseSelect from "@/components/BaseSelect.vue";
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseInput,
+    BaseSelect,
+    BaseButton,
+  },
   props: ["file", "isEditing", "employees", "errors"],
   data() {
     return {
@@ -66,11 +89,7 @@ export default {
         employee_id: this.fileData.employee_id,
         file: this.fileData.file,
       };
-      if (this.isEditing) {
-        this.$emit("update", data);
-      } else {
-        this.$emit("create", data);
-      }
+      this.$emit(this.isEditing ? "update" : "create", data);
     },
   },
 };

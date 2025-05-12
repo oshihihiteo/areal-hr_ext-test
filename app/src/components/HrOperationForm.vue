@@ -1,5 +1,14 @@
 <script>
+import BaseSelect from "@/components/BaseSelect.vue";
+import BaseInput from "@/components/BaseInput.vue";
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseSelect,
+    BaseInput,
+    BaseButton,
+  },
   props: [
     "hrOperation",
     "employees",
@@ -34,12 +43,43 @@ export default {
       },
     },
   },
+  computed: {
+    selectedEmployee() {
+      const id = parseInt(this.hrOperationData.employee_id);
+      return this.employees.find((emp) => emp.id === id);
+    },
+    selectedEmployeeActionId() {
+      return this.selectedEmployee?.action_id ?? null;
+    },
+    selectedAction() {
+      return this.actions.find(
+          (a) => a.id === this.hrOperationData.action_id
+      );
+    },
+    selectedActionName() {
+      return this.selectedAction ? this.selectedAction.name : "";
+    },
+    isDismissal() {
+      return this.selectedActionName === "Уволен(а)";
+    },
+    isSalaryChange() {
+      return this.selectedActionName === "Изменена заработная плата";
+    },
+    filteredActions() {
+      if (this.selectedEmployeeActionId === null) {
+        return this.actions.filter(
+            (action) => action.name === "Принят(а) на должность"
+        );
+      }
+      return this.actions;
+    },
+  },
   methods: {
     async submitForm() {
       if (this.isEditing) {
-        this.$emit("update", { ...this.hrOperationData });
+        this.$emit("update", {...this.hrOperationData});
       } else {
-        this.$emit("create", { ...this.hrOperationData });
+        this.$emit("create", {...this.hrOperationData});
       }
     },
     cancelForm() {
@@ -54,96 +94,85 @@ export default {
     <h3>
       {{
         isEditing
-          ? "Редактировать кадровую операцию"
-          : "Добавить кадровую операцию"
+            ? "Редактировать кадровую операцию"
+            : "Добавить кадровую операцию"
       }}
     </h3>
 
     <form @submit.prevent="submitForm">
-      <div>
-        <label for="employee">Сотрудник:</label>
-        <select v-model="hrOperationData.employee_id" id="employee" required>
-          <option disabled value="">Выберите сотрудника</option>
-          <option
-            v-for="employee in employees"
-            :key="employee.id"
-            :value="employee.id"
-          >
-            {{ employee.lastname }} {{ employee.firstname }}
-            {{ employee.patronymic }}, отдел - {{ employee.department_name }},
-            должность - {{ employee.position_name }}
-          </option>
-        </select>
-        <p v-if="errors?.employee_id" class="error">{{ errors.employee_id }}</p>
-      </div>
+      <BaseSelect
+          v-model="hrOperationData.employee_id"
+          id="employee"
+          label="Сотрудник:"
+          :options="employees"
+          :valueKey="'id'"
+          :labelKey="employee => `${employee.lastname} ${employee.firstname} ${employee.patronymic}, отдел - ${employee.department_name}, должность - ${employee.position_name}`"
+          placeholder="Выберите сотрудника"
+          :required="true"
+          :error="errors?.employee_id"
+      />
 
-      <div>
-        <label for="action">Действие:</label>
-        <select v-model="hrOperationData.action_id" id="action" required>
-          <option disabled value="">Выберите действие</option>
-          <option v-for="action in actions" :key="action.id" :value="action.id">
-            {{ action.name }}
-          </option>
-        </select>
-        <p v-if="errors?.action_id" class="error">{{ errors.action_id }}</p>
-      </div>
+      <BaseSelect
+          v-model="hrOperationData.action_id"
+          id="action"
+          label="Действие:"
+          :options="filteredActions"
+          valueKey="id"
+          labelKey="name"
+          placeholder="Выберите действие"
+          :required="true"
+          :error="errors?.action_id"
+      />
 
-      <div>
-        <label for="department">Отдел:</label>
-        <select
-          v-model="hrOperationData.department_id"
-          id="department"
-          required
-        >
-          <option disabled value="">Выберите отдел</option>
-          <option
-            v-for="department in departments"
-            :key="department.id"
-            :value="department.id"
-          >
-            {{ department.name }}
-          </option>
-        </select>
-        <p v-if="errors?.department_id" class="error">
-          {{ errors.department_id }}
-        </p>
-      </div>
+      <template v-if="!isDismissal">
+        <template v-if="!isSalaryChange">
+          <BaseSelect
+              v-model="hrOperationData.department_id"
+              id="department"
+              label="Отдел:"
+              :options="departments"
+              valueKey="id"
+              labelKey="name"
+              placeholder="Выберите отдел"
+              :required="true"
+              :error="errors?.department_id"
+          />
 
-      <div>
-        <label for="position">Позиция:</label>
-        <select v-model="hrOperationData.position_id" id="position" required>
-          <option disabled value="">Выберите позицию</option>
-          <option
-            v-for="position in positions"
-            :key="position.id"
-            :value="position.id"
-          >
-            {{ position.name }}
-          </option>
-        </select>
-        <p v-if="errors?.position_id" class="error">{{ errors.position_id }}</p>
-      </div>
+          <BaseSelect
+              v-model="hrOperationData.position_id"
+              id="position"
+              label="Позиция:"
+              :options="positions"
+              valueKey="id"
+              labelKey="name"
+              placeholder="Выберите позицию"
+              :required="true"
+              :error="errors?.position_id"
+          />
+        </template>
 
-      <div>
-        <label for="salary">Зарплата:</label>
-        <input
-          type="number"
-          id="salary"
-          v-model="hrOperationData.salary"
-          required
+        <BaseInput
+            v-model="hrOperationData.salary"
+            id="salary"
+            type="number"
+            label="Зарплата:"
+            :required="true"
+            :error="errors?.salary"
         />
-        <p v-if="errors?.salary" class="error">{{ errors.salary }}</p>
-      </div>
+      </template>
 
       <div class="form-buttons">
-        <button type="submit">
+        <BaseButton type="submit">
           {{ isEditing ? "Сохранить" : "Добавить" }}
-        </button>
-        <button type="button" @click="cancelForm">Отмена</button>
+        </BaseButton>
+        <BaseButton type="button" @click="cancelForm">
+          Отмена
+        </BaseButton>
       </div>
     </form>
   </div>
 </template>
+
 
 <style scoped>
 .form-container {
@@ -155,5 +184,9 @@ export default {
   color: red;
   font-size: 0.9em;
   margin-top: 4px;
+}
+
+.form-buttons {
+  margin-top: 10px;
 }
 </style>

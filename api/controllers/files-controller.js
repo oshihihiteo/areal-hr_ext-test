@@ -9,7 +9,6 @@ exports.getAllFiles = async (req, res) => {
     const files = await FilesModel.getAll();
     res.status(200).json({ files });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Ошибка при получении файлов", error });
   }
 };
@@ -20,7 +19,6 @@ exports.getAllEmployeeFiles = async (req, res) => {
     const files = await FilesModel.findByEmployee(id);
     res.status(200).json(files);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Ошибка при получении файлов", error });
   }
 };
@@ -34,7 +32,6 @@ exports.getFileById = async (req, res) => {
     }
     res.status(200).json(file);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Ошибка при получении файла", error });
   }
 };
@@ -43,15 +40,12 @@ exports.getRawFileById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const file = await FilesModel.getById(id);
-
     if (!file) {
       return res.status(404).json({ message: "Файл не найден" });
     }
-
     const filePath = path.resolve(__dirname, "../../files", file.file);
     res.sendFile(filePath);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Ошибка при получении файла", error });
   }
 };
@@ -63,12 +57,11 @@ exports.createFile = async (req, res) => {
       employee_id: req.body.employee_id,
       file: req.file.filename,
     };
-    const { error, value } = await fileSchema.validateAsync(file, {
+    const { error } = await fileSchema.validateAsync(file, {
       abortEarly: false,
     });
     const fileId = await FilesModel.create(file);
     res.status(201).json({ message: "Файл создан" });
-
     const changelog = {
       object_type_id: 6,
       object_id: fileId,
@@ -77,12 +70,10 @@ exports.createFile = async (req, res) => {
     await Changelog.createChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
-      return res.status(400).json({
-        status: "error",
-        errors: formatJoiErrors(error),
-      });
+      return res
+        .status(400)
+        .json({ status: "error", errors: formatJoiErrors(error) });
     }
-    console.error(error);
     res.status(500).json({ message: "Ошибка при создании файла", error });
   }
 };
@@ -95,12 +86,11 @@ exports.editFile = async (req, res) => {
       employee_id: req.body.employee_id,
       file: req.file.filename,
     };
-    const { error, value } = await fileSchema.validateAsync(file, {
+    const { error } = await fileSchema.validateAsync(file, {
       abortEarly: false,
     });
     await FilesModel.edit(id, file);
-    res.status(201).json({ message: "Файл изменён" });
-
+    res.status(200).json({ message: "Файл изменён" });
     const changelog = {
       object_type_id: 6,
       object_id: id,
@@ -109,13 +99,10 @@ exports.editFile = async (req, res) => {
     await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
-      return res.status(400).json({
-        message:
-          "Ошибка валидации данных: " +
-          (error.details?.[0]?.message || error.message),
-      });
+      return res
+        .status(400)
+        .json({ status: "error", errors: formatJoiErrors(error) });
     }
-    console.error(error);
     res.status(500).json({ message: "Ошибка при изменении файла", error });
   }
 };
@@ -125,7 +112,6 @@ exports.deleteFile = async (req, res) => {
     const id = parseInt(req.params.id);
     await FilesModel.delete(id);
     res.status(200).json({ message: "Файл удалён" });
-
     const changelog = {
       object_type_id: 6,
       object_id: id,
@@ -133,7 +119,6 @@ exports.deleteFile = async (req, res) => {
     };
     await Changelog.deleteChangelog(req.user.id, changelog);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Ошибка при удалении файла", error });
   }
 };

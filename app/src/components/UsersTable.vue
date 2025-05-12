@@ -1,7 +1,8 @@
 <script>
-import { limitUser } from "@/instances/users.js";
+import BaseButton from "@/components/BaseButton.vue";
 
 export default {
+  components: { BaseButton },
   props: ["isAdmin", "isAdminOrManager", "users"],
   methods: {
     editUser(user) {
@@ -29,11 +30,25 @@ export default {
       <tr v-for="user in users" :key="user.id">
         <td>{{ user.lastname }} {{ user.firstname }} {{ user.patronymic }}</td>
         <td>
-          <button v-if="isAdmin" @click="editUser(user)">Редактировать</button>
-          <button v-if="isAdmin" @click="deleteUser(user.id)">Удалить</button>
-          <button v-if="isAdmin" @click="limitUser(user.id)">
+          <BaseButton v-if="isAdmin" @click="editUser(user)" size="sm">
+            Редактировать
+          </BaseButton>
+          <BaseButton
+            v-if="isAdmin"
+            @click="deleteUser(user.id)"
+            variant="danger"
+            size="sm"
+          >
+            Удалить
+          </BaseButton>
+          <BaseButton
+            v-if="isAdmin"
+            @click="limitUser(user.id)"
+            variant="warning"
+            size="sm"
+          >
             Ограничить доступ
-          </button>
+          </BaseButton>
         </td>
       </tr>
     </tbody>

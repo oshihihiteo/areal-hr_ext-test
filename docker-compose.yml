@@ -31,7 +31,7 @@ services:
       context: .
       dockerfile: ./containers/app/Dockerfile
     ports:
-      - "${VITE_PORT}:${VITE_PORT}"
+      - "80:80"
     env_file:
       - ./.env
     depends_on:

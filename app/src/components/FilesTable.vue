@@ -1,5 +1,8 @@
 <script>
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: { BaseButton },
   props: ["isAdminOrManager", "files"],
   methods: {
     editFile(file) {
@@ -30,15 +33,22 @@ export default {
         <td>{{ file.name }}</td>
         <td>{{ file.lastname }} {{ file.firstname }} {{ file.patronymic }}</td>
         <td>
-          <button @click="openFile(file)">Открыть файл</button>
+          <BaseButton @click="openFile(file)" size="sm">
+            Открыть файл
+          </BaseButton>
         </td>
         <td>
-          <button v-if="isAdminOrManager" @click="editFile(file)">
+          <BaseButton v-if="isAdminOrManager" @click="editFile(file)" size="sm">
             Редактировать
-          </button>
-          <button v-if="isAdminOrManager" @click="deleteFile(file.id)">
+          </BaseButton>
+          <BaseButton
+            v-if="isAdminOrManager"
+            @click="deleteFile(file.id)"
+            variant="danger"
+            size="sm"
+          >
             Удалить
-          </button>
+          </BaseButton>
         </td>
       </tr>
     </tbody>

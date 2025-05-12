@@ -31,65 +31,39 @@ class FilesModel {
   }
 
   static async create(data) {
-    try {
-      await client.query("BEGIN");
-
-      const result = await client.query(
-        `INSERT INTO files
-                 VALUES (DEFAULT, $1, $2, $3)
-                 RETURNING id`,
-        [data.employee_id, data.name, data.file],
-      );
-
-      await client.query("COMMIT");
-      return result.rows[0].id;
-    } catch (err) {
-      await client.query("ROLLBACK");
-      throw err;
-    }
+    const result = await client.query(
+      `INSERT INTO files (employee_id, name, file)
+             VALUES ($1, $2, $3)
+             RETURNING id`,
+      [data.employee_id, data.name, data.file],
+    );
+    return result.rows[0].id;
   }
 
   static async edit(id, data) {
-    try {
-      await client.query("BEGIN");
-
-      await client.query(
-        `UPDATE files
-                 SET employee_id = $2,
-                     name        = $3,
-                     file        = $4
-                 WHERE id = $1`,
-        [id, data.employee_id, data.name, data.file],
-      );
-
-      await client.query("COMMIT");
-    } catch (err) {
-      await client.query("ROLLBACK");
-      throw err;
-    }
+    await client.query(
+      `UPDATE files
+             SET employee_id = $2,
+                 name        = $3,
+                 file        = $4
+             WHERE id = $1`,
+      [id, data.employee_id, data.name, data.file],
+    );
   }
 
   static async delete(id) {
-    try {
-      await client.query("BEGIN");
-
-      await client.query("DELETE FROM files WHERE id = $1", [id]);
-
-      await client.query("COMMIT");
-    } catch (err) {
-      await client.query("ROLLBACK");
-      throw err;
-    }
+    await client.query("DELETE FROM files WHERE id = $1", [id]);
   }
 
   static async findByName(fileName, id) {
-    const query = `
-            SELECT *
-            FROM files
-            WHERE name = $1
-              AND ($2::int IS NULL OR id != $2)`;
-    const params = [fileName, id];
-    const result = await client.query(query, params);
+    const result = await client.query(
+      `
+                SELECT *
+                FROM files
+                WHERE name = $1
+                  AND ($2::int IS NULL OR id != $2)`,
+      [fileName, id],
+    );
     return result.rows[0] || null;
   }
 }

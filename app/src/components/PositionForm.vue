@@ -1,5 +1,12 @@
 <script>
+import BaseInput from "@/components/BaseInput.vue";
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseInput,
+    BaseButton,
+  },
   props: ["position", "isEditing", "errors"],
   data() {
     return {
@@ -19,12 +26,7 @@ export default {
       const data = {
         name: this.positionData.name.trim(),
       };
-
-      if (this.isEditing) {
-        this.$emit("update", data);
-      } else {
-        this.$emit("create", data);
-      }
+      this.$emit(this.isEditing ? "update" : "create", data);
     },
     cancelForm() {
       this.$emit("cancel");
@@ -36,12 +38,21 @@ export default {
 <template>
   <div class="form-container">
     <h3>{{ isEditing ? "Редактировать должность" : "Добавить должность" }}</h3>
-    <input v-model="positionData.name" placeholder="Название должности" />
-    <p v-if="errors?.name" class="error">{{ errors.name }}</p>
-    <button @click="submitForm">
-      {{ isEditing ? "Сохранить" : "Добавить" }}
-    </button>
-    <button @click="cancelForm">Отмена</button>
+
+    <BaseInput
+        v-model="positionData.name"
+        id="position-name"
+        label="Название должности"
+        :required="true"
+        :error="errors?.name"
+    />
+
+    <div class="buttons">
+      <BaseButton @click="submitForm">
+        {{ isEditing ? "Сохранить" : "Добавить" }}
+      </BaseButton>
+      <BaseButton @click="cancelForm" type="button">Отмена</BaseButton>
+    </div>
   </div>
 </template>
 

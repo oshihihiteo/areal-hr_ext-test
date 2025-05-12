@@ -1,6 +1,6 @@
 require("dotenv").config({ path: "../.env" });
 const { Client } = require("pg");
-const bcrypt = require("bcryptjs");
+const argon2 = require("argon2");
 const client = require("./index");
 
 (async () => {
@@ -11,7 +11,7 @@ const client = require("./index");
         );
 
         if (!user.rows.length) {
-            const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+            const hashedPassword = await argon2.hash(process.env.ADMIN_PASSWORD);
             await client.query(
                 `INSERT INTO users (role_id, lastname, firstname, patronymic, login, password)
          VALUES (1, $1, $2, $3, $4, $5)

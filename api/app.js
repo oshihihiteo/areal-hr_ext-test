@@ -19,18 +19,25 @@ const app = express();
 
 app.use(express.json());
 
-app.use(session({
-    secret: process.env.SECRET_SESSION_KEY,
-    resave: false,
-    saveUninitialized: false,
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(cors({
     origin: process.env.CLIENT_BASE_URL,
     credentials: true,
 }));
+
+app.use(session({
+    secret: process.env.SECRET_SESSION_KEY,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * 60 * 24,
+    },
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/organizations", organizationsRoutes);
 app.use("/auth", authRouter);

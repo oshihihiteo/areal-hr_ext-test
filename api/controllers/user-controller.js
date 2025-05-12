@@ -2,7 +2,7 @@ const Users = require("../models/users-model");
 const Changelog = require("./changelog-controller");
 const userSchema = require("../validationSchemas/user-schema");
 const formatJoiErrors = require("../config/validation/joi-validation");
-const bcrypt = require("bcryptjs");
+const argon2 = require("argon2");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -11,7 +11,7 @@ exports.getAllUsers = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Ошибка при получении списка пользователей.", error });
+      .json({ message: "Ошибка при получении списка пользователей", error });
   }
 };
 
@@ -19,32 +19,32 @@ exports.getUserById = async (req, res) => {
   const id = parseInt(req.params.id);
   try {
     const user = await Users.getById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Пользователь не найден" });
+    }
     res.status(200).json({ user });
   } catch (error) {
-    console.error(error);
     res
       .status(500)
-      .json({ message: "Ошибка при получении пользователя: ", error });
+      .json({ message: "Ошибка при получении пользователя", error });
   }
 };
 
 exports.createUser = async (req, res) => {
   try {
     const user = req.body.userData;
-    const { error, value } = await userSchema.validateAsync(user, {
-      context: {},
-      abortEarly: false,
-    });
-    user.password = await bcrypt.hash(user.password, 10);
+    await userSchema.validateAsync(user, { abortEarly: false });
+
+    user.password = await argon2.hash(user.password);
     const userId = await Users.create(user);
-    res.status(200).json({ message: "Пользователь создан." });
+    res.status(201).json({ message: "Пользователь создан", id: userId });
 
     const changelog = {
-      object_type_id: 1,
+      object_type_id: 7,
       object_id: userId,
-      changed_fields: user,
+      changed_fields: { ...user, password: "***" }, // скрываем пароль
     };
-    await Changelog.createChangelog(changelog);
+    await Changelog.createChangelog(req.user.id, changelog);
   } catch (error) {
     if (error.isJoi) {
       return res.status(400).json({
@@ -52,32 +52,9 @@ exports.createUser = async (req, res) => {
         errors: formatJoiErrors(error),
       });
     }
-    console.error(error);
-    return res.status(500).json({
-      message: "Ошибка при создании пользователя",
-      error: error.message,
-    });
-  }
-};
-
-exports.deleteUser = async (req, res) => {
-  const id = parseInt(req.params.id);
-
-  try {
-    const user = await Users.getById(id);
-    await Users.delete(id);
-    res.status(200).json({ message: "Пользователь удален." });
-    const changelog = {
-      object_type_id: 7,
-      object_id: id,
-      changed_fields: null,
-    };
-    await Changelog.deleteChangelog(changelog);
-  } catch (error) {
-    console.error(error);
     res
       .status(500)
-      .json({ message: "Ошибка при удалении пользователя: ", error });
+      .json({ message: "Ошибка при создании пользователя", error });
   }
 };
 
@@ -85,46 +62,22 @@ exports.editUser = async (req, res) => {
   const id = parseInt(req.params.id);
   try {
     const user = req.body.userData;
-    const { error, value } = await userSchema.validateAsync(user, {
+    await userSchema.validateAsync(user, {
       context: { id },
       abortEarly: false,
     });
-    user.password = await bcrypt.hash(user.password, 10);
-    await Users.edit(id, user);
-    res.status(200).json({ message: "Пользователь изменен." });
 
-    const changelog = {
-      object_type_id: 7,
-      object_id: id,
-      changed_fields: user,
-    };
-    await Changelog.editChangelog(changelog);
-  } catch (error) {
-    if (error.isJoi) {
-      return res.status(400).json({
-        status: "error",
-        errors: formatJoiErrors(error),
-      });
+    if (user.password) {
+      user.password = await argon2.hash(user.password);
     }
-    console.error(error);
-    return res.status(500).json({
-      message: "Ошибка при редактировании пользователя",
-      error: error.message,
-    });
-  }
-};
 
-exports.limitUserAccess = async (req, res) => {
-  const id = parseInt(req.params.id);
-  try {
-
-    await Users.limitAccess(id);
-    res.status(200).json({ message: "Права доступа пользователя изменены." });
+    await Users.edit(id, user);
+    res.status(200).json({ message: "Пользователь изменён" });
 
     const changelog = {
       object_type_id: 7,
       object_id: id,
-      changed_fields: "Доступ ограничен",
+      changed_fields: { ...user, password: "***" },
     };
     await Changelog.editChangelog(req.user.id, changelog);
   } catch (error) {
@@ -134,13 +87,49 @@ exports.limitUserAccess = async (req, res) => {
         errors: formatJoiErrors(error),
       });
     }
-    console.error(error);
-    return res.status(500).json({
-      message: "Ошибка при редактировании пользователя",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({ message: "Ошибка при редактировании пользователя", error });
   }
 };
 
+exports.deleteUser = async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const user = await Users.getById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Пользователь не найден" });
+    }
 
+    await Users.delete(id);
+    res.status(200).json({ message: "Пользователь удалён" });
 
+    const changelog = {
+      object_type_id: 7,
+      object_id: id,
+      changed_fields: null,
+    };
+    await Changelog.deleteChangelog(req.user.id, changelog);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Ошибка при удалении пользователя", error });
+  }
+};
+
+exports.limitUserAccess = async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    await Users.limitAccess(id);
+    res.status(200).json({ message: "Права доступа пользователя ограничены" });
+
+    const changelog = {
+      object_type_id: 7,
+      object_id: id,
+      changed_fields: { role_id: 3 },
+    };
+    await Changelog.editChangelog(req.user.id, changelog);
+  } catch (error) {
+    res.status(500).json({ message: "Ошибка при ограничении доступа", error });
+  }
+};

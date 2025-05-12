@@ -217,7 +217,6 @@ exports.up = (pgm) => {
       notNull: true,
     },
   });
-
   pgm.createTable("object_types", {
     id: {
       type: "serial",

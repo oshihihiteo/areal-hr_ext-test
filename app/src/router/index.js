@@ -28,17 +28,31 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+let isUserChecked = false;
+
+router.beforeEach(async (to, from, next) => {
   const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
 
   const userStore = useUserStore();
 
-  if (authRequired && !userStore.user) {
+  if (!isUserChecked) {
+    isUserChecked = true;
+    await userStore.getCurrentUser();
+  }
+
+  const isLoggedIn = !!userStore.user;
+
+  if (authRequired && !isLoggedIn) {
     return next('/login');
   }
 
-  next();
+  if (to.path === '/login' && isLoggedIn) {
+    return next('/');
+  }
+
+  return next();
 });
+
 
 export default router;

@@ -1,5 +1,14 @@
 <script>
+import BaseInput from "@/components/BaseInput.vue";
+import BaseSelect from "@/components/BaseSelect.vue";
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseInput,
+    BaseSelect,
+    BaseButton,
+  },
   props: ["department", "departments", "organizations", "isEditing", "errors"],
   data() {
     return {
@@ -34,9 +43,9 @@ export default {
       };
 
       if (this.isEditing) {
-        this.$emit("update", { ...this.departmentData });
+        this.$emit("update", data);
       } else {
-        this.$emit("create", { ...this.departmentData });
+        this.$emit("create", data);
       }
     },
     cancelForm() {
@@ -50,51 +59,55 @@ export default {
   <div class="form-container">
     <h3>{{ isEditing ? "Редактировать отдел" : "Создать отдел" }}</h3>
 
-    <input
-      type="text"
+    <BaseInput
       v-model="departmentData.name"
-      placeholder="Название отдела"
+      id="name"
+      label="Название отдела"
+      :required="true"
+      :error="errors?.name"
     />
-    <p v-if="errors?.name" class="error">{{ errors.name }}</p>
 
-    <select v-model="departmentData.organization_id">
-      <option value="" disabled hidden>Выберите организацию</option>
-      <option
-        v-for="organization in organizations"
-        :key="organization.id"
-        :value="organization.id"
-      >
-        {{ organization.name }}
-      </option>
-    </select>
-    <p v-if="errors?.organization_id" class="error">
-      {{ errors.organization_id }}
-    </p>
+    <BaseSelect
+      v-model="departmentData.organization_id"
+      id="organization"
+      label="Организация:"
+      :options="organizations"
+      valueKey="id"
+      labelKey="name"
+      placeholder="Выберите организацию"
+      :required="true"
+      :error="errors?.organization_id"
+    />
 
-    <select v-model="departmentData.parent_id">
-      <option value="" disabled hidden>Выберите родительский отдел</option>
-      <option :value="null">-</option>
-      <option
-        v-for="department in departments"
-        :key="department.id"
-        :value="department.id"
-      >
-        {{ department.name }}
-      </option>
-    </select>
-    <p v-if="errors?.parent_id" class="error">{{ errors.parent_id }}</p>
+    <BaseSelect
+      v-model="departmentData.parent_id"
+      id="parent"
+      label="Родительский отдел:"
+      :options="departments"
+      valueKey="id"
+      labelKey="name"
+      placeholder="Выберите родительский отдел"
+      :error="errors?.parent_id"
+    >
+      <!-- Добавим опцию "-" вручную, если нужно -->
+      <template #before-options>
+        <option :value="null">-</option>
+      </template>
+    </BaseSelect>
 
-    <input
-      type="text"
+    <BaseInput
       v-model="departmentData.comment"
-      placeholder="Комментарий"
+      id="comment"
+      label="Комментарий"
+      :error="errors?.comment"
     />
-    <p v-if="errors?.comment" class="error">{{ errors.comment }}</p>
 
-    <button @click="submitForm">
-      {{ isEditing ? "Сохранить" : "Добавить" }}
-    </button>
-    <button @click="cancelForm">Отмена</button>
+    <div class="form-buttons">
+      <BaseButton type="submit" @click="submitForm">
+        {{ isEditing ? "Сохранить" : "Добавить" }}
+      </BaseButton>
+      <BaseButton @click="cancelForm">Отмена</BaseButton>
+    </div>
   </div>
 </template>
 

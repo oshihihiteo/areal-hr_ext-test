@@ -1,6 +1,6 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcryptjs');
+const argon2 = require("argon2");
 const Users = require('../../models/users-model');
 
 passport.use(new LocalStrategy(
@@ -9,7 +9,7 @@ passport.use(new LocalStrategy(
         const user = await Users.findByLogin(login);
         if (!user) return done(null, false, { message: 'Пользователь не существует' });
 
-        const match = await bcrypt.compare(password, user.password);
+        const match = await argon2.verify(user.password, password);
         if (!match) return done(null, false, { message: 'Неверный пароль' });
 
         return done(null, user);

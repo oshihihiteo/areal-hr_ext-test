@@ -1,6 +1,6 @@
-FROM node:22
+FROM node:22-alpine as build
 
-WORKDIR ./app
+WORKDIR /app
 
 COPY ./app/package*.json ./
 
@@ -8,6 +8,14 @@ RUN npm install
 
 COPY ./app /app
 
-EXPOSE 3000
+RUN npm run build
 
-CMD ["npm", "run", "dev"]
+FROM nginx:alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+COPY ./app/nginx.conf /etc/nginx/conf.d/
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

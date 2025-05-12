@@ -1,5 +1,8 @@
 <script>
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: { BaseButton },
   props: ["isAdminOrManager", "organizations"],
   methods: {
     editOrganization(organization) {
@@ -26,20 +29,21 @@ export default {
         <td>{{ organization.name }}</td>
         <td>{{ organization.comment }}</td>
         <td>
-          <button
+          <BaseButton
             v-if="isAdminOrManager"
-            class="edit-btn"
             @click="editOrganization(organization)"
+            size="sm"
           >
             Редактировать
-          </button>
-          <button
+          </BaseButton>
+          <BaseButton
             v-if="isAdminOrManager"
-            class="delete-btn"
             @click="deleteOrganization(organization.id)"
+            variant="danger"
+            size="sm"
           >
             Удалить
-          </button>
+          </BaseButton>
         </td>
       </tr>
     </tbody>

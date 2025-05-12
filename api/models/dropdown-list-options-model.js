@@ -36,7 +36,8 @@ class DropdownListOptionsModel {
                    e.firstname,
                    e.patronymic,
                    p.name AS position_name,
-                   d.name AS department_name
+                   d.name AS department_name,
+                   ho.action_id
             FROM employees e
                      LEFT JOIN (SELECT DISTINCT ON (employee_id) *
                                 FROM hr_operations

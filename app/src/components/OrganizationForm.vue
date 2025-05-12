@@ -1,9 +1,19 @@
 <script>
+import BaseInput from "@/components/BaseInput.vue";
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseInput,
+    BaseButton,
+  },
   props: ["organization", "isEditing", "errors"],
   data() {
     return {
-      organizationData: { name: "", comment: null },
+      organizationData: {
+        name: "",
+        comment: null,
+      },
     };
   },
   watch: {
@@ -23,11 +33,7 @@ export default {
         name: this.organizationData.name.trim(),
         comment: this.organizationData.comment?.trim() || null,
       };
-      if (this.isEditing) {
-        this.$emit("update", data);
-      } else {
-        this.$emit("create", data);
-      }
+      this.$emit(this.isEditing ? "update" : "create", data);
     },
     cancelForm() {
       this.$emit("cancel");
@@ -41,22 +47,28 @@ export default {
     <h3>
       {{ isEditing ? "Редактировать организацию" : "Создать организацию" }}
     </h3>
-    <input
-      type="text"
+
+    <BaseInput
       v-model="organizationData.name"
-      placeholder="Название организации"
+      id="org-name"
+      label="Название организации"
+      :required="true"
+      :error="errors?.name"
     />
-    <p v-if="errors?.name" class="error">{{ errors.name }}</p>
-    <input
-      type="text"
+
+    <BaseInput
       v-model="organizationData.comment"
-      placeholder="Комментарий"
+      id="org-comment"
+      label="Комментарий"
+      :error="errors?.comment"
     />
-    <p v-if="errors?.comment" class="error">{{ errors.comment }}</p>
-    <button @click="submitForm">
-      {{ isEditing ? "Сохранить" : "Добавить" }}
-    </button>
-    <button @click="cancelForm">Отмена</button>
+
+    <div class="buttons">
+      <BaseButton @click="submitForm">
+        {{ isEditing ? "Сохранить" : "Добавить" }}
+      </BaseButton>
+      <BaseButton @click="cancelForm" type="button">Отмена</BaseButton>
+    </div>
   </div>
 </template>
 

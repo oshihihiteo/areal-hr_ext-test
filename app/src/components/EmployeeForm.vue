@@ -1,5 +1,12 @@
 <script>
+import BaseInput from "@/components/BaseInput.vue";
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseInput,
+    BaseButton,
+  },
   props: ["employee", "isEditing", "errors"],
   data() {
     return {
@@ -65,11 +72,7 @@ export default {
         passport_unit_code: this.employeeData.passport_unit_code.trim(),
         passport_issued_by: this.employeeData.passport_issued_by.trim(),
       };
-      if (this.isEditing) {
-        this.$emit("update", data);
-      } else {
-        this.$emit("create", data);
-      }
+      this.$emit(this.isEditing ? "update" : "create", data);
     },
     cancelForm() {
       this.$emit("cancel");
@@ -83,92 +86,123 @@ export default {
     <h3>
       {{ isEditing ? "Редактировать сотрудника" : "Добавить сотрудника" }}
     </h3>
+
     <h5>Личные данные</h5>
-    <input v-model="employeeData.lastname" placeholder="Фамилия" required />
-    <p v-if="errors?.lastname" class="error">{{ errors.lastname }}</p>
-    <input v-model="employeeData.firstname" placeholder="Имя" required />
-    <p v-if="errors?.firstname" class="error">{{ errors.firstname }}</p>
-    <input v-model="employeeData.patronymic" placeholder="Отчество" />
-    <p v-if="errors?.patronymic" class="error">{{ errors.patronymic }}</p>
-    <input
-      type="date"
+    <BaseInput
+      v-model="employeeData.lastname"
+      id="lastname"
+      label="Фамилия"
+      :required="true"
+      :error="errors?.lastname"
+    />
+    <BaseInput
+      v-model="employeeData.firstname"
+      id="firstname"
+      label="Имя"
+      :required="true"
+      :error="errors?.firstname"
+    />
+    <BaseInput
+      v-model="employeeData.patronymic"
+      id="patronymic"
+      label="Отчество"
+      :error="errors?.patronymic"
+    />
+    <BaseInput
       v-model="employeeData.birth_date"
-      placeholder="Дата рождения"
-      required
+      id="birth_date"
+      label="Дата рождения"
+      type="date"
+      :required="true"
+      :error="errors?.birth_date"
     />
-    <p v-if="errors?.birth_date" class="error">{{ errors.birth_date }}</p>
+
     <h5>Адрес</h5>
-    <input
+    <BaseInput
       v-model="employeeData.address_region"
-      placeholder="Регион"
-      required
+      id="address_region"
+      label="Регион"
+      :required="true"
+      :error="errors?.address_region"
     />
-    <p v-if="errors?.address_region" class="error">
-      {{ errors.address_region }}
-    </p>
-    <input
+    <BaseInput
       v-model="employeeData.address_settlement"
-      placeholder="Населённый пункт"
-      required
+      id="address_settlement"
+      label="Населённый пункт"
+      :required="true"
+      :error="errors?.address_settlement"
     />
-    <p v-if="errors?.address_settlement" class="error">
-      {{ errors.address_settlement }}
-    </p>
-    <input v-model="employeeData.address_street" placeholder="Улица" required />
-    <p v-if="errors?.address_street" class="error">
-      {{ errors.address_street }}
-    </p>
-    <input v-model="employeeData.address_house" placeholder="Дом" required />
-    <p v-if="errors?.address_house" class="error">{{ errors.address_house }}</p>
-    <input v-model="employeeData.address_building" placeholder="Строение" />
-    <p v-if="errors?.address_building" class="error">
-      {{ errors.address_building }}
-    </p>
-    <input v-model="employeeData.address_apartment" placeholder="Квартира" />
-    <p v-if="errors?.address_apartment" class="error">
-      {{ errors.address_apartment }}
-    </p>
+    <BaseInput
+      v-model="employeeData.address_street"
+      id="address_street"
+      label="Улица"
+      :required="true"
+      :error="errors?.address_street"
+    />
+    <BaseInput
+      v-model="employeeData.address_house"
+      id="address_house"
+      label="Дом"
+      :required="true"
+      :error="errors?.address_house"
+    />
+    <BaseInput
+      v-model="employeeData.address_building"
+      id="address_building"
+      label="Строение"
+      :error="errors?.address_building"
+    />
+    <BaseInput
+      v-model="employeeData.address_apartment"
+      id="address_apartment"
+      label="Квартира"
+      :error="errors?.address_apartment"
+    />
+
     <h5>Паспортные данные</h5>
-    <input
+    <BaseInput
       v-model="employeeData.passport_series"
-      placeholder="Серия"
-      required
+      id="passport_series"
+      label="Серия"
+      :required="true"
+      :error="errors?.passport_series"
     />
-    <p v-if="errors?.passport_series" class="error">
-      {{ errors.passport_series }}
-    </p>
-    <input
+    <BaseInput
       v-model="employeeData.passport_number"
-      placeholder="Номер"
-      required
+      id="passport_number"
+      label="Номер"
+      :required="true"
+      :error="errors?.passport_number"
     />
-    <p v-if="errors?.passport_number" class="error">
-      {{ errors.passport_number }}
-    </p>
-    <input type="date" v-model="employeeData.passport_issued_date" required />
-    <p v-if="errors?.passport_issued_date" class="error">
-      {{ errors.passport_issued_date }}
-    </p>
-    <input
+    <BaseInput
+      v-model="employeeData.passport_issued_date"
+      id="passport_issued_date"
+      label="Дата выдачи"
+      type="date"
+      :required="true"
+      :error="errors?.passport_issued_date"
+    />
+    <BaseInput
       v-model="employeeData.passport_unit_code"
-      placeholder="Код подразделения"
-      required
+      id="passport_unit_code"
+      label="Код подразделения"
+      :required="true"
+      :error="errors?.passport_unit_code"
     />
-    <p v-if="errors?.passport_unit_code" class="error">
-      {{ errors.passport_unit_code }}
-    </p>
-    <input
+    <BaseInput
       v-model="employeeData.passport_issued_by"
-      placeholder="Кем выдан"
-      required
+      id="passport_issued_by"
+      label="Кем выдан"
+      :required="true"
+      :error="errors?.passport_issued_by"
     />
-    <p v-if="errors?.passport_issued_by" class="error">
-      {{ errors.passport_issued_by }}
-    </p>
-    <button @click="submitForm">
-      {{ isEditing ? "Сохранить" : "Добавить" }}
-    </button>
-    <button @click="cancelForm">Отмена</button>
+
+    <div class="form-buttons">
+      <BaseButton @click="submitForm">{{
+        isEditing ? "Сохранить" : "Добавить"
+      }}</BaseButton>
+      <BaseButton @click="cancelForm">Отмена</BaseButton>
+    </div>
   </div>
 </template>
 

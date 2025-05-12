@@ -1,5 +1,12 @@
 <script>
+import BaseInput from "@/components/BaseInput.vue";
+import BaseButton from "@/components/BaseButton.vue";
+
 export default {
+  components: {
+    BaseInput,
+    BaseButton,
+  },
   props: ["user", "isEditing", "errors"],
   data() {
     return {
@@ -35,11 +42,7 @@ export default {
         login: this.userData.login.trim(),
         password: this.userData.password.trim(),
       };
-      if (this.isEditing) {
-        this.$emit("update", data);
-      } else {
-        this.$emit("create", data);
-      }
+      this.$emit(this.isEditing ? "update" : "create", data);
     },
     cancelForm() {
       this.$emit("cancel");
@@ -50,23 +53,54 @@ export default {
 
 <template>
   <div class="form-container">
-    <h3>
-      {{ isEditing ? "Редактировать пользователя" : "Добавить пользователя" }}
-    </h3>
-    <input v-model="userData.lastname" placeholder="Фамилия" required />
-    <p v-if="errors?.lastname" class="error">{{ errors.lastname }}</p>
-    <input v-model="userData.firstname" placeholder="Имя" required />
-    <p v-if="errors?.firstname" class="error">{{ errors.firstname }}</p>
-    <input v-model="userData.patronymic" placeholder="Отчество" />
-    <p v-if="errors?.patronymic" class="error">{{ errors.patronymic }}</p>
-    <input v-model="userData.login" placeholder="Логин" required />
-    <p v-if="errors?.login" class="error">{{ errors.login }}</p>
-    <input v-model="userData.password" placeholder="Пароль" required />
-    <p v-if="errors?.password" class="error">{{ errors.password }}</p>
-    <button @click="submitForm">
-      {{ isEditing ? "Сохранить" : "Добавить" }}
-    </button>
-    <button @click="cancelForm">Отмена</button>
+    <h3>{{ isEditing ? "Редактировать пользователя" : "Добавить пользователя" }}</h3>
+
+    <BaseInput
+        v-model="userData.lastname"
+        label="Фамилия"
+        id="user-lastname"
+        :required="true"
+        :error="errors?.lastname"
+    />
+
+    <BaseInput
+        v-model="userData.firstname"
+        label="Имя"
+        id="user-firstname"
+        :required="true"
+        :error="errors?.firstname"
+    />
+
+    <BaseInput
+        v-model="userData.patronymic"
+        label="Отчество"
+        id="user-patronymic"
+        :error="errors?.patronymic"
+    />
+
+    <BaseInput
+        v-model="userData.login"
+        label="Логин"
+        id="user-login"
+        :required="true"
+        :error="errors?.login"
+    />
+
+    <BaseInput
+        v-model="userData.password"
+        label="Пароль"
+        id="user-password"
+        type="password"
+        :required="true"
+        :error="errors?.password"
+    />
+
+    <div class="buttons">
+      <BaseButton @click="submitForm">
+        {{ isEditing ? "Сохранить" : "Добавить" }}
+      </BaseButton>
+      <BaseButton type="button" @click="cancelForm">Отмена</BaseButton>
+    </div>
   </div>
 </template>
 
