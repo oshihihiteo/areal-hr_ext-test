@@ -19,11 +19,6 @@ const app = express();
 
 app.use(express.json());
 
-app.use(cors({
-    origin: process.env.CLIENT_BASE_URL,
-    credentials: true,
-}));
-
 app.use(session({
     secret: process.env.SECRET_SESSION_KEY,
     resave: false,
@@ -38,6 +33,11 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(cors({
+    origin: process.env.CLIENT_BASE_URL,
+    credentials: true,
+}));
 
 app.use("/organizations", organizationsRoutes);
 app.use("/auth", authRouter);

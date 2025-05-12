@@ -6,15 +6,19 @@ COPY ./app/package*.json ./
 
 RUN npm install
 
-COPY ./app /app
+
+COPY app .
+COPY .env .
 
 RUN npm run build
 
 FROM nginx:alpine
 
-COPY --from=build /app/dist /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
 
-COPY ./app/nginx.conf /etc/nginx/conf.d/
+COPY containers/app/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 

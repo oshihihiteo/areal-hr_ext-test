@@ -40,7 +40,7 @@ export default defineComponent({
     const route = useRoute();
 
     const showNavbar = computed(() => {
-      return route.path !== "/login";
+      return route.path !== '/login';
     });
 
     return {
