@@ -52,9 +52,8 @@ export default {
       return this.selectedEmployee?.action_id ?? null;
     },
     selectedAction() {
-      return this.actions.find(
-          (a) => a.id === this.hrOperationData.action_id
-      );
+      const actionId = parseInt(this.hrOperationData.action_id);
+      return this.actions.find((a) => a.id === actionId);
     },
     selectedActionName() {
       return this.selectedAction ? this.selectedAction.name : "";
@@ -66,20 +65,26 @@ export default {
       return this.selectedActionName === "Изменена заработная плата";
     },
     filteredActions() {
-      if (this.selectedEmployeeActionId === null) {
+      const isDismissed = this.selectedEmployeeActionId === 3;
+      const isNotHired = this.selectedEmployeeActionId === null;
+
+      if (isDismissed || isNotHired) {
         return this.actions.filter(
-            (action) => action.name === "Принят(а) на должность"
+          (action) => action.name === "Принят(а) на должность",
         );
       }
-      return this.actions;
+
+      return this.actions.filter(
+        (action) => action.name !== "Принят(а) на должность",
+      );
     },
   },
   methods: {
     async submitForm() {
       if (this.isEditing) {
-        this.$emit("update", {...this.hrOperationData});
+        this.$emit("update", { ...this.hrOperationData });
       } else {
-        this.$emit("create", {...this.hrOperationData});
+        this.$emit("create", { ...this.hrOperationData });
       }
     },
     cancelForm() {
@@ -91,73 +96,75 @@ export default {
 
 <template>
   <div class="form-container">
-    <h3>
-      {{
-        isEditing
+    <form @submit.prevent="submitForm">
+      <h3>
+        {{
+          isEditing
             ? "Редактировать кадровую операцию"
             : "Добавить кадровую операцию"
-      }}
-    </h3>
+        }}
+      </h3>
 
-    <form @submit.prevent="submitForm">
       <BaseSelect
-          v-model="hrOperationData.employee_id"
-          id="employee"
-          label="Сотрудник:"
-          :options="employees"
-          :valueKey="'id'"
-          :labelKey="employee => `${employee.lastname} ${employee.firstname} ${employee.patronymic}, отдел - ${employee.department_name}, должность - ${employee.position_name}`"
-          placeholder="Выберите сотрудника"
-          :required="true"
-          :error="errors?.employee_id"
+        v-model="hrOperationData.employee_id"
+        id="employee"
+        label="Сотрудник:"
+        :options="employees"
+        :valueKey="'id'"
+        :labelKey="
+          (employee) =>
+            `${employee.lastname} ${employee.firstname} ${employee.patronymic}, отдел - ${employee.department_name}, должность - ${employee.position_name}`
+        "
+        placeholder="Выберите сотрудника"
+        :required="true"
+        :error="errors?.employee_id"
       />
 
       <BaseSelect
-          v-model="hrOperationData.action_id"
-          id="action"
-          label="Действие:"
-          :options="filteredActions"
+        v-model="hrOperationData.action_id"
+        id="action"
+        label="Действие:"
+        :options="filteredActions"
+        valueKey="id"
+        labelKey="name"
+        placeholder="Выберите действие"
+        :required="true"
+        :error="errors?.action_id"
+      />
+
+      <template v-if="!isDismissal && !isSalaryChange">
+        <BaseSelect
+          v-model="hrOperationData.department_id"
+          id="department"
+          label="Отдел:"
+          :options="departments"
           valueKey="id"
           labelKey="name"
-          placeholder="Выберите действие"
+          placeholder="Выберите отдел"
           :required="true"
-          :error="errors?.action_id"
-      />
+          :error="errors?.department_id"
+        />
+        <BaseSelect
+          v-model="hrOperationData.position_id"
+          id="position"
+          label="Позиция:"
+          :options="positions"
+          valueKey="id"
+          labelKey="name"
+          placeholder="Выберите позицию"
+          :required="true"
+          :error="errors?.position_id"
+        />
+      </template>
 
       <template v-if="!isDismissal">
-        <template v-if="!isSalaryChange">
-          <BaseSelect
-              v-model="hrOperationData.department_id"
-              id="department"
-              label="Отдел:"
-              :options="departments"
-              valueKey="id"
-              labelKey="name"
-              placeholder="Выберите отдел"
-              :required="true"
-              :error="errors?.department_id"
-          />
-
-          <BaseSelect
-              v-model="hrOperationData.position_id"
-              id="position"
-              label="Позиция:"
-              :options="positions"
-              valueKey="id"
-              labelKey="name"
-              placeholder="Выберите позицию"
-              :required="true"
-              :error="errors?.position_id"
-          />
-        </template>
-
         <BaseInput
-            v-model="hrOperationData.salary"
-            id="salary"
-            type="number"
-            label="Зарплата:"
-            :required="true"
-            :error="errors?.salary"
+          v-model="hrOperationData.salary"
+          id="salary"
+          type="number"
+          label="Зарплата:"
+          :required="true"
+          :error="errors?.salary"
         />
       </template>
 
@@ -165,14 +172,11 @@ export default {
         <BaseButton type="submit">
           {{ isEditing ? "Сохранить" : "Добавить" }}
         </BaseButton>
-        <BaseButton type="button" @click="cancelForm">
-          Отмена
-        </BaseButton>
+        <BaseButton type="button" @click="cancelForm"> Отмена</BaseButton>
       </div>
     </form>
   </div>
 </template>
-
 
 <style scoped>
 .form-container {

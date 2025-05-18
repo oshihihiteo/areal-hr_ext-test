@@ -56,6 +56,7 @@ export default {
 </script>
 
 <template>
+  <form @submit.prevent="submitForm">
   <div class="form-container">
     <h3>{{ isEditing ? "Редактировать отдел" : "Создать отдел" }}</h3>
 
@@ -89,7 +90,6 @@ export default {
       placeholder="Выберите родительский отдел"
       :error="errors?.parent_id"
     >
-      <!-- Добавим опцию "-" вручную, если нужно -->
       <template #before-options>
         <option :value="null">-</option>
       </template>
@@ -103,12 +103,13 @@ export default {
     />
 
     <div class="form-buttons">
-      <BaseButton type="submit" @click="submitForm">
+      <BaseButton type="submit">
         {{ isEditing ? "Сохранить" : "Добавить" }}
       </BaseButton>
       <BaseButton @click="cancelForm">Отмена</BaseButton>
     </div>
   </div>
+  </form>
 </template>
 
 <style scoped>

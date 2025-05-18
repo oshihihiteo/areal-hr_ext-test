@@ -2,11 +2,23 @@
   <div class="form-group">
     <label :for="id">{{ label }}</label>
     <input
-        :type="type"
+        v-if="mask && mask.length > 0"
+        v-mask="mask"
         :id="id"
+        :type="type"
         :value="modelValue"
         @input="$emit('update:modelValue', $event.target.value)"
         :required="required"
+        :placeholder="placeholder"
+    />
+    <input
+        v-else
+        :id="id"
+        :type="type"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+        :required="required"
+        :placeholder="placeholder"
     />
     <p v-if="error" class="error">{{ error }}</p>
   </div>
@@ -27,6 +39,14 @@ export default {
       default: false,
     },
     error: String,
+    mask: {
+      type: String,
+      default: null,
+    },
+    placeholder: {
+      type: String,
+      default: '',
+    },
   },
 };
 </script>
@@ -35,6 +55,7 @@ export default {
 .form-group {
   margin-bottom: 10px;
 }
+
 .error {
   color: red;
   font-size: 0.9em;

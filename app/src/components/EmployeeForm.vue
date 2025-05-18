@@ -82,6 +82,7 @@ export default {
 </script>
 
 <template>
+  <form @submit.prevent="submitForm">
   <div class="form-container">
     <h3>
       {{ isEditing ? "Редактировать сотрудника" : "Добавить сотрудника" }}
@@ -164,6 +165,8 @@ export default {
       v-model="employeeData.passport_series"
       id="passport_series"
       label="Серия"
+      :mask="'####'"
+      :placeholder="'1234'"
       :required="true"
       :error="errors?.passport_series"
     />
@@ -171,6 +174,8 @@ export default {
       v-model="employeeData.passport_number"
       id="passport_number"
       label="Номер"
+      :mask="'######'"
+      :placeholder="'123456'"
       :required="true"
       :error="errors?.passport_number"
     />
@@ -186,6 +191,8 @@ export default {
       v-model="employeeData.passport_unit_code"
       id="passport_unit_code"
       label="Код подразделения"
+      :mask="'###-###'"
+      :placeholder="'123-456'"
       :required="true"
       :error="errors?.passport_unit_code"
     />
@@ -198,12 +205,13 @@ export default {
     />
 
     <div class="form-buttons">
-      <BaseButton @click="submitForm">{{
+      <BaseButton type="submit">{{
         isEditing ? "Сохранить" : "Добавить"
       }}</BaseButton>
       <BaseButton @click="cancelForm">Отмена</BaseButton>
     </div>
   </div>
+  </form>
 </template>
 
 <style scoped>

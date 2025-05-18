@@ -53,6 +53,7 @@ export default {
 
 <template>
   <div class="form-container">
+    <form @submit.prevent="submitForm">
     <h3>{{ isEditing ? "Редактировать пользователя" : "Добавить пользователя" }}</h3>
 
     <BaseInput
@@ -96,11 +97,12 @@ export default {
     />
 
     <div class="buttons">
-      <BaseButton @click="submitForm">
+      <BaseButton type="submit">
         {{ isEditing ? "Сохранить" : "Добавить" }}
       </BaseButton>
       <BaseButton type="button" @click="cancelForm">Отмена</BaseButton>
     </div>
+    </form>
   </div>
 </template>
 
