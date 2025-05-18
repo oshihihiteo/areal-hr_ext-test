@@ -6,7 +6,7 @@
 
 ## Содержание
 
-- [Начало работы](./guide/getting-started.md)
-- [Backend](./guide/backend.md)
-- [Frontend](./guide/frontend.md)
-- [Роли](./guide/roles.md)
+- [Начало работы](guide/getting-started.md)
+- [Backend](guide/backend.md)
+- [Frontend](guide/frontend.md)
+- [Роли](guide/roles.md)

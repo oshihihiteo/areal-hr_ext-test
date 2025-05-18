@@ -36,5 +36,14 @@ services:
       - ./.env
     depends_on:
       - api
+  docs:
+    build:
+      context: .
+      dockerfile: containers/docs/Dockerfile
+    container_name: docs
+    ports:
+      - '5173:80'
+    volumes:
+      - ./docs:/docs
 volumes:
   db_data:
